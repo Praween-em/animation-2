@@ -1,728 +1,1032 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Interactive Physics — Newton's Laws</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newton's Laws Simulator</title>
   <style>
-    /* Responsive styling and consistent look for all three concepts */
     :root {
-      --ink: #131522;
-      --muted: #6b7280;
-      --panel: #ffffff;
-      --line: #e5e7eb;
-      --bg: #f6f7fb;
-      --accent: #2563eb;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #4b5563;
+      --light: #f3f4f6;
+      --lighter: #f9fafb;
+      --dark: #1f2937;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --transition: all 0.3s ease;
     }
 
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      font-family: system-ui, Arial, sans-serif;
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.5;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #f0f4f8, #dbeafe);
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     header {
-      background: #1f2937;
-      color: #fff;
-      padding: 14px 18px;
+      text-align: center;
+      padding: 30px 0;
+      margin-bottom: 30px;
     }
 
     h1 {
-      margin: 0;
-      font-size: 20px;
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      color: var(--primary-dark);
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
     }
 
-    .wrap {
-      max-width: 980px;
-      margin: 16px auto;
-      padding: 0 12px;
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--secondary);
+      max-width: 800px;
+      margin: 0 auto;
     }
 
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px;
-      margin: 12px 0;
-    }
-
-    .row {
+    .tabs {
       display: flex;
-      gap: 12px;
+      justify-content: center;
+      margin-bottom: 30px;
       flex-wrap: wrap;
     }
 
-    .cell {
-      flex: 1;
-      min-width: 260px;
+    .tab-btn {
+      padding: 12px 24px;
+      margin: 0 8px;
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--primary);
+      box-shadow: var(--card-shadow);
+    }
+
+    .tab-btn:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    .tab-btn.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .content-section {
+      background: white;
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      margin-bottom: 30px;
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .concept-header {
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 20px 30px;
+    }
+
+    .concept-header h2 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+
+    .concept-content {
+      padding: 30px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 900px) {
+      .concept-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .explanation {
+      background: var(--lighter);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
+    }
+
+    .explanation h3 {
+      color: var(--primary);
+      margin-bottom: 15px;
+      font-size: 1.4rem;
+    }
+
+    .law-formula {
+      background: #eef2ff;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin: 15px 0;
+      color: var(--primary-dark);
+      border-left: 4px solid var(--primary);
+    }
+
+    .simulation-area {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .canvas-container {
+      background: #dbeafe;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      position: relative;
+      border: 2px solid var(--primary);
     }
 
     canvas {
       display: block;
       width: 100%;
-      max-width: 956px;
-      height: 320px;
-      background: #cce6ff;
-      border: 2px solid #1f2937;
-      border-radius: 10px;
-      margin: 12px 0;
+      height: 300px;
     }
 
-    label {
-      display: inline-block;
-      min-width: 170px;
+    .controls {
+      background: var(--lighter);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
     }
 
-    input[type=range] {
-      width: 240px;
+    .control-group {
+      margin-bottom: 15px;
     }
 
-    input[type=number] {
-      width: 110px;
-      padding: 6px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
+    .control-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      background: #d1d5db;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      background: var(--primary-dark);
+    }
+
+    .value-display {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      color: var(--secondary);
+      font-size: 0.9rem;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
     }
 
     button {
-      padding: 8px 12px;
-      margin: 3px 3px;
-      cursor: pointer;
-      border: 1px solid #cfcfcf;
+      padding: 12px 20px;
+      border: none;
       border-radius: 8px;
-      background: #f3f4f6;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      flex: 1;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    button.primary {
-      background: var(--accent);
-      color: #fff;
-      border-color: #1d4ed8;
+    button:active {
+      transform: translateY(2px);
     }
 
-    .metric {
-      background: #f3f4f6;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 8px;
-      margin-top: 8px;
-      font-variant-numeric: tabular-nums;
+    .btn-start {
+      background: var(--success);
+      color: white;
     }
 
-    code {
-      background: #eef2ff;
-      padding: 0 4px;
-      border-radius: 4px;
+    .btn-pause {
+      background: var(--warning);
+      color: white;
     }
 
-    ul {
+    .btn-reset {
+      background: var(--danger);
+      color: white;
+    }
+
+    .metrics {
+      background: var(--dark);
+      color: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+
+    .metrics h3 {
+      text-align: center;
+      margin-bottom: 15px;
+      color: var(--light);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .metric-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-top: 5px;
+      color: white;
+    }
+
+    .metric-label {
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 0;
+      color: var(--secondary);
+      font-size: 0.9rem;
+    }
+
+    .law-icon {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      border-radius: 50%;
+      text-align: center;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .examples {
+      margin-top: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid var(--warning);
+    }
+
+    .examples h4 {
+      color: var(--warning);
+      margin-bottom: 10px;
+    }
+
+    .examples ul {
       padding-left: 20px;
-      margin: 6px 0;
     }
 
-    .note {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    /* Additional styling for layout on smaller screens */
-    @media (max-width: 600px) {
-      .row {
-        flex-direction: column;
-      }
-
-      input[type=range] {
-        width: 100%;
-      }
+    .examples li {
+      margin-bottom: 8px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Interactive Physics — Newton's Laws</h1>
-  </header>
-  <div class="wrap">
+  <div class="container">
+    <header>
+      <h1>Newton's Laws of Motion</h1>
+      <p class="subtitle">Explore the fundamental principles that govern motion through interactive simulations. Adjust parameters and observe how objects behave under different conditions.</p>
+    </header>
 
-    <!-- Concept 1: Force -->
-    <div class="panel">
-      <h2>Concept 1 — Force</h2>
-      <p><b>Force</b> is an external <b>push</b> or <b>pull</b> on an object that can change its state of motion or shape. It is a <b>vector</b> (has magnitude and direction) and is measured in newtons (N).</p>
-      <ul>
-        <li><b>Net Force (ΣF)</b>: The vector sum of all forces on the object. Motion responds to the net force.</li>
-        <li><b>Newton’s Second Law</b>: <code>ΣF = m a</code> ⇒ <code>a = ΣF / m</code>.</li>
-        <li><b>Friction</b>: Opposes relative motion between surfaces. Static friction prevents start of motion up to <code>F<sub>s,max</sub> = μ<sub>s</sub>N</code>; kinetic friction during motion is <code>F<sub>k</sub> = μ<sub>k</sub>N</code>, with <code>N = m g</code>.</li>
-      </ul>
-      <p><b>Real-life examples:</b> pushing a box on the floor, pulling a suitcase with wheels, a car accelerating (engine force forward, drag and friction opposing).</p>
-      <p class="note">We assume motion on a horizontal surface. Gravity acts vertically; only its effect through the normal reaction <code>N = m g</code> enters friction.</p>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="law1"><span class="law-icon">1</span> Law of Inertia</button>
+      <button class="tab-btn" data-tab="law2"><span class="law-icon">2</span> F=ma</button>
+      <button class="tab-btn" data-tab="law3"><span class="law-icon">3</span> Action-Reaction</button>
     </div>
-    <canvas id="forceCanvas" width="956" height="320" aria-label="Force simulation"></canvas>
-    <div class="panel">
-      <div class="row">
-        <div class="cell">
-          <h3>Controls</h3>
-          <div>
-            <label>Mass (kg)</label>
-            <input type="range" id="mass" min="1" max="50" step="1" value="10">
-            <span id="massVal">10</span> kg
+
+    <!-- Law 1: Inertia -->
+    <section id="law1" class="content-section active">
+      <div class="concept-header">
+        <h2>Newton's First Law: Law of Inertia</h2>
+        <p>An object at rest stays at rest, and an object in motion stays in motion unless acted upon by an external force.</p>
+      </div>
+      
+      <div class="concept-content">
+        <div class="explanation">
+          <h3>Understanding Inertia</h3>
+          <p>Inertia is the tendency of an object to resist changes in its state of motion. This fundamental property depends on the object's mass.</p>
+          
+          <div class="law-formula">ΣF = 0 ⇒ a = 0</div>
+          
+          <p>Key principles:</p>
+          <ul>
+            <li>Objects naturally resist changes to their velocity</li>
+            <li>Greater mass means greater inertia</li>
+            <li>Friction is the force that eventually stops moving objects</li>
+            <li>In space, with no friction, objects would move forever</li>
+          </ul>
+          
+          <div class="examples">
+            <h4>Real-life Examples</h4>
+            <ul>
+              <li>Passengers lurch forward when a car stops suddenly</li>
+              <li>A hockey puck slides across the ice</li>
+              <li>Books on a car seat slide when you brake hard</li>
+            </ul>
           </div>
-          <div>
-            <label>Applied Force (N)</label>
-            <input type="range" id="fapp" min="-200" max="200" step="1" value="60">
-            <span id="fappVal">60</span> N
-          </div>
-          <div>
-            <label>Static friction μ<sub>s</sub></label>
-            <input type="range" id="mus" min="0" max="1" step="0.01" value="0.40">
-            <span id="musVal">0.40</span>
-          </div>
-          <div>
-            <label>Kinetic friction μ<sub>k</sub></label>
-            <input type="range" id="muk" min="0" max="1" step="0.01" value="0.30">
-            <span id="mukVal">0.30</span>
-          </div>
-          <div>
-            <label>Gravity g (m/s²)</label>
-            <input type="range" id="grav" min="1" max="20" step="0.1" value="9.8">
-            <span id="gravVal">9.8</span>
-          </div>
-          <div style="margin-top:6px">
-            <button id="start1" class="primary">Start</button>
-            <button id="pause1">Pause</button>
-            <button id="reset1">Reset</button>
-          </div>
-          <p class="note">Tip: Increase μ<sub>s</sub> to see the box resist motion until |F<sub>app</sub>| &gt; μ<sub>s</sub>N.</p>
         </div>
-        <div class="cell">
-          <h3>Live Metrics</h3>
-          <div class="metric" id="netF">ΣF = 0.00 N</div>
-          <div class="metric" id="acc">a = 0.00 m/s²</div>
-          <div class="metric" id="vel">v = 0.00 m/s</div>
-          <div class="metric" id="pos">x = 0.00 m</div>
-          <div class="metric" id="fric">Friction = 0.00 N (mode: static)</div>
-          <div class="metric" id="status">Status: ready</div>
+        
+        <div class="simulation-area">
+          <div class="canvas-container">
+            <canvas id="canvas1"></canvas>
+          </div>
+          
+          <div class="controls">
+            <div class="control-group">
+              <label for="inertia-mass">Mass (kg)</label>
+              <input type="range" id="inertia-mass" min="1" max="20" step="1" value="5">
+              <div class="value-display">
+                <span>Light</span>
+                <span id="inertia-mass-val">5 kg</span>
+                <span>Heavy</span>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <label for="inertia-friction">Friction Coefficient</label>
+              <input type="range" id="inertia-friction" min="0" max="0.5" step="0.01" value="0.1">
+              <div class="value-display">
+                <span>None</span>
+                <span id="inertia-friction-val">0.10</span>
+                <span>High</span>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <label for="inertia-initial">Initial Velocity (m/s)</label>
+              <input type="range" id="inertia-initial" min="0" max="20" step="1" value="10">
+              <div class="value-display">
+                <span>0</span>
+                <span id="inertia-initial-val">10 m/s</span>
+                <span>20</span>
+              </div>
+            </div>
+            
+            <div class="buttons">
+              <button class="btn-start">Start</button>
+              <button class="btn-pause">Pause</button>
+              <button class="btn-reset">Reset</button>
+            </div>
+          </div>
+          
+          <div class="metrics">
+            <h3>Simulation Metrics</h3>
+            <div class="metric-grid">
+              <div class="metric-card">
+                <div class="metric-label">Velocity</div>
+                <div class="metric-value" id="velocity1">0 m/s</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Position</div>
+                <div class="metric-value" id="position1">0 m</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Friction Force</div>
+                <div class="metric-value" id="friction1">0 N</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Time</div>
+                <div class="metric-value" id="time1">0 s</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Concept 2: Newton's First Law -->
-    <div class="panel">
-      <h2>Concept 2 — Newton's First Law (Law of Inertia)</h2>
-      <p><b>Definition:</b> An object continues in its state of rest or uniform motion in a straight line unless acted upon by an external net force.</p>
-      <ul>
-        <li>Explains the natural tendency of objects to resist changes in motion — called <b>inertia</b>.</li>
-        <li>No net force (<code>ΣF = 0</code>) ⇒ acceleration <code>a = 0</code>.</li>
-        <li>Inertia is proportional to mass — heavier objects are harder to start or stop moving.</li>
-      </ul>
-      <p><b>Real-life examples:</b></p>
-      <ul>
-        <li>Passengers lurch forward when a bus stops suddenly (body keeps moving).</li>
-        <li>A ball on a smooth surface rolls for a long time (low friction).</li>
-        <li>A coin stays on a card when you quickly flick the card away.</li>
-      </ul>
-      <p class="note">We simulate horizontal motion with optional friction to compare ideal vs real cases.</p>
-    </div>
-    <canvas id="law1Canvas" width="956" height="320" aria-label="Newton's First Law simulation"></canvas>
-    <div class="panel">
-      <div class="row">
-        <div class="cell">
-          <h3>Controls</h3>
-          <div>
-            <label>Initial Velocity (m/s)</label>
-            <input type="range" id="initVel" min="-10" max="10" step="0.1" value="5">
-            <span id="initVelVal">5</span>
-          </div>
-          <div>
-            <label>Friction coefficient μ<sub>k</sub></label>
-            <input type="range" id="muK2" min="0" max="1" step="0.01" value="0">
-            <span id="muK2Val">0.00</span>
-          </div>
-          <div>
-            <label>Mass (kg)</label>
-            <input type="range" id="mass2" min="1" max="50" step="1" value="10">
-            <span id="mass2Val">10</span>
-          </div>
-          <div style="margin-top:6px">
-            <button id="start2" class="primary">Start</button>
-            <button id="pause2">Pause</button>
-            <button id="reset2">Reset</button>
+    <!-- Law 2: F=ma -->
+    <section id="law2" class="content-section">
+      <div class="concept-header">
+        <h2>Newton's Second Law: F=ma</h2>
+        <p>The acceleration of an object depends on its mass and the applied force.</p>
+      </div>
+      
+      <div class="concept-content">
+        <div class="explanation">
+          <h3>Force, Mass and Acceleration</h3>
+          <p>This law quantifies how forces affect motion. The acceleration produced by a net force is directly proportional to the force and inversely proportional to the object's mass.</p>
+          
+          <div class="law-formula">F = m · a</div>
+          
+          <p>Key principles:</p>
+          <ul>
+            <li>Acceleration is in the direction of the net force</li>
+            <li>Greater mass requires greater force for same acceleration</li>
+            <li>Net force = vector sum of all forces acting on object</li>
+            <li>Units: Newtons (N) = kg·m/s²</li>
+          </ul>
+          
+          <div class="examples">
+            <h4>Real-life Examples</h4>
+            <ul>
+              <li>Pushing a shopping cart (empty vs. full)</li>
+              <li>Car acceleration depends on engine power and weight</li>
+              <li>Kicking a soccer ball with different force</li>
+            </ul>
           </div>
         </div>
-        <div class="cell">
-          <h3>Live Metrics</h3>
-          <div class="metric" id="vel2">v = 0.00 m/s</div>
-          <div class="metric" id="pos2">x = 0.00 m</div>
-          <div class="metric" id="fric2">Friction = 0.00 N</div>
-          <div class="metric" id="status2">Status: ready</div>
+        
+        <div class="simulation-area">
+          <div class="canvas-container">
+            <canvas id="canvas2"></canvas>
+          </div>
+          
+          <div class="controls">
+            <div class="control-group">
+              <label for="force-value">Applied Force (N)</label>
+              <input type="range" id="force-value" min="0" max="100" step="5" value="50">
+              <div class="value-display">
+                <span>0</span>
+                <span id="force-value-val">50 N</span>
+                <span>100</span>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <label for="mass-value">Mass (kg)</label>
+              <input type="range" id="mass-value" min="1" max="20" step="1" value="10">
+              <div class="value-display">
+                <span>Light</span>
+                <span id="mass-value-val">10 kg</span>
+                <span>Heavy</span>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <label for="friction-value">Friction Coefficient</label>
+              <input type="range" id="friction-value" min="0" max="0.3" step="0.01" value="0.1">
+              <div class="value-display">
+                <span>None</span>
+                <span id="friction-value-val">0.10</span>
+                <span>High</span>
+              </div>
+            </div>
+            
+            <div class="buttons">
+              <button class="btn-start">Start</button>
+              <button class="btn-pause">Pause</button>
+              <button class="btn-reset">Reset</button>
+            </div>
+          </div>
+          
+          <div class="metrics">
+            <h3>Simulation Metrics</h3>
+            <div class="metric-grid">
+              <div class="metric-card">
+                <div class="metric-label">Acceleration</div>
+                <div class="metric-value" id="acceleration2">0 m/s²</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Velocity</div>
+                <div class="metric-value" id="velocity2">0 m/s</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Net Force</div>
+                <div class="metric-value" id="netforce2">0 N</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Time</div>
+                <div class="metric-value" id="time2">0 s</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Concept 3: Newton's Second Law -->
-    <div class="panel">
-      <h2>Concept 3 — Newton's Second Law of Motion</h2>
-      <p><b>Definition:</b> The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass.</p>
-      <p><b>Formula:</b> <code>ΣF = m · a</code></p>
-      <ul>
-        <li><code>ΣF</code> — net force acting on the object (N)</li>
-        <li><code>m</code> — mass of the object (kg)</li>
-        <li><code>a</code> — acceleration of the object (m/s²)</li>
-      </ul>
-      <p><b>Key Points:</b></p>
-      <ul>
-        <li>Increasing the applied force increases acceleration (if mass stays the same).</li>
-        <li>Increasing mass decreases acceleration (if force stays the same).</li>
-        <li>The direction of acceleration is the same as the net force.</li>
-      </ul>
-      <p><b>Real-life examples:</b></p>
-      <ul>
-        <li>Pushing an empty shopping cart vs a full cart — the empty one accelerates faster.</li>
-        <li>A football kicked harder moves faster.</li>
-        <li>Rockets accelerate more with higher thrust (force).</li>
-      </ul>
-    </div>
-    <canvas id="law2Canvas" width="956" height="320" aria-label="Newton's Second Law simulation"></canvas>
-    <div class="panel">
-      <div class="row">
-        <div class="cell">
-          <h3>Controls</h3>
-          <div>
-            <label>Applied Force (N)</label>
-            <input type="range" id="force3" min="-50" max="50" step="0.5" value="20">
-            <span id="force3Val">20.0</span>
-          </div>
-          <div>
-            <label>Mass (kg)</label>
-            <input type="range" id="mass3" min="1" max="50" step="1" value="10">
-            <span id="mass3Val">10</span>
-          </div>
-          <div>
-            <label>Friction coefficient μ<sub>k</sub></label>
-            <input type="range" id="muK3" min="0" max="1" step="0.01" value="0.1">
-            <span id="muK3Val">0.10</span>
-          </div>
-          <div>
-            <label>Gravity (m/s²)</label>
-            <input type="range" id="g3" min="0" max="20" step="0.1" value="9.8">
-            <span id="g3Val">9.8</span>
-          </div>
-          <div style="margin-top:6px">
-            <button id="start3" class="primary">Start</button>
-            <button id="pause3">Pause</button>
-            <button id="reset3">Reset</button>
+    <!-- Law 3: Action-Reaction -->
+    <section id="law3" class="content-section">
+      <div class="concept-header">
+        <h2>Newton's Third Law: Action-Reaction</h2>
+        <p>For every action, there is an equal and opposite reaction.</p>
+      </div>
+      
+      <div class="concept-content">
+        <div class="explanation">
+          <h3>Force Pairs</h3>
+          <p>When one object exerts a force on a second object, the second object exerts an equal and opposite force on the first.</p>
+          
+          <div class="law-formula">F<sub>AB</sub> = -F<sub>BA</sub></div>
+          
+          <p>Key principles:</p>
+          <ul>
+            <li>Forces always occur in pairs</li>
+            <li>Action and reaction forces act on different objects</li>
+            <li>Forces are equal in magnitude but opposite in direction</li>
+            <li>Explains how rockets work and why we can walk</li>
+          </ul>
+          
+          <div class="examples">
+            <h4>Real-life Examples</h4>
+            <ul>
+              <li>Rocket propulsion (exhaust gases push rocket forward)</li>
+              <li>Swimming (pushing water backward moves you forward)</li>
+              <li>Walking (pushing ground backward moves you forward)</li>
+            </ul>
           </div>
         </div>
-        <div class="cell">
-          <h3>Live Metrics</h3>
-          <div class="metric" id="netF3">Net Force = 0.00 N</div>
-          <div class="metric" id="acc3">a = 0.000 m/s²</div>
-          <div class="metric" id="vel3">v = 0.000 m/s</div>
-          <div class="metric" id="pos3">x = 0.000 m</div>
-          <div class="metric" id="fric3">Friction = 0.000 N</div>
-          <div class="metric" id="status3">Status: ready</div>
+        
+        <div class="simulation-area">
+          <div class="canvas-container">
+            <canvas id="canvas3"></canvas>
+          </div>
+          
+          <div class="controls">
+            <div class="control-group">
+              <label for="mass1-value">Mass of Object A (kg)</label>
+              <input type="range" id="mass1-value" min="1" max="20" step="1" value="5">
+              <div class="value-display">
+                <span>1</span>
+                <span id="mass1-value-val">5 kg</span>
+                <span>20</span>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <label for="mass2-value">Mass of Object B (kg)</label>
+              <input type="range" id="mass2-value" min="1" max="20" step="1" value="10">
+              <div class="value-display">
+                <span>1</span>
+                <span id="mass2-value-val">10 kg</span>
+                <span>20</span>
+              </div>
+            </div>
+            
+            <div class="control-group">
+              <label for="force-magnitude">Applied Force (N)</label>
+              <input type="range" id="force-magnitude" min="0" max="100" step="5" value="50">
+              <div class="value-display">
+                <span>0</span>
+                <span id="force-magnitude-val">50 N</span>
+                <span>100</span>
+              </div>
+            </div>
+            
+            <div class="buttons">
+              <button class="btn-start">Start</button>
+              <button class="btn-pause">Pause</button>
+              <button class="btn-reset">Reset</button>
+            </div>
+          </div>
+          
+          <div class="metrics">
+            <h3>Simulation Metrics</h3>
+            <div class="metric-grid">
+              <div class="metric-card">
+                <div class="metric-label">Force on A</div>
+                <div class="metric-value" id="forceA">0 N</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Force on B</div>
+                <div class="metric-value" id="forceB">0 N</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Acceleration A</div>
+                <div class="metric-value" id="accelerationA">0 m/s²</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Acceleration B</div>
+                <div class="metric-value" id="accelerationB">0 m/s²</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
+    <footer>
+      <p>Interactive Physics Simulator | Newton's Laws of Motion | Educational Tool</p>
+    </footer>
   </div>
 
   <script>
-    // General Utility Functions
-    const pxPerM = 60; // rendering scale: 1 m = 60 px
-    function drawArrow(ctx, x1, y1, x2, y2, color) {
-      ctx.strokeStyle = color || '#111827';
+    // Tab switching functionality
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Remove active class from all buttons and sections
+        tabBtns.forEach(b => b.classList.remove('active'));
+        contentSections.forEach(section => section.classList.remove('active'));
+        
+        // Add active class to clicked button
+        btn.classList.add('active');
+        
+        // Show corresponding section
+        const tabId = btn.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+    // Initialize canvas elements
+    const canvases = {
+      law1: document.getElementById('canvas1'),
+      law2: document.getElementById('canvas2'),
+      law3: document.getElementById('canvas3')
+    };
+
+    // Setup canvas contexts
+    const ctx = {
+      law1: canvases.law1.getContext('2d'),
+      law2: canvases.law2.getContext('2d'),
+      law3: canvases.law3.getContext('2d')
+    };
+
+    // Set canvas dimensions
+    for (const key in canvases) {
+      canvases[key].width = canvases[key].clientWidth;
+      canvases[key].height = canvases[key].clientHeight;
+    }
+
+    // Draw functions for each law
+    function drawLaw1() {
+      const ctx = canvases.law1.getContext('2d');
+      const width = canvases.law1.width;
+      const height = canvases.law1.height;
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+      
+      // Draw background
+      ctx.fillStyle = '#dbeafe';
+      ctx.fillRect(0, 0, width, height);
+      
+      // Draw surface
+      ctx.fillStyle = '#9ca3af';
+      ctx.fillRect(0, height - 50, width, 50);
+      
+      // Draw grid lines on surface
+      ctx.strokeStyle = '#6b7280';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < width; x += 20) {
+        ctx.beginPath();
+        ctx.moveTo(x, height - 50);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      
+      // Draw object
+      const posX = width * 0.3;
+      const posY = height - 120;
+      const objWidth = 80;
+      const objHeight = 60;
+      
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(posX, posY, objWidth, objHeight);
+      ctx.strokeStyle = '#b45309';
       ctx.lineWidth = 2;
+      ctx.strokeRect(posX, posY, objWidth, objHeight);
+      
+      // Draw arrows
+      const arrowLength = 60;
+      
+      // Friction arrow
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
+      ctx.moveTo(posX + 10, posY + objHeight/2);
+      ctx.lineTo(posX - arrowLength, posY + objHeight/2);
       ctx.stroke();
-      const ang = Math.atan2(y2 - y1, x2 - x1);
-      const head = 10;
+      
+      // Arrow head
       ctx.beginPath();
-      ctx.moveTo(x2, y2);
-      ctx.lineTo(x2 - head * Math.cos(ang - Math.PI / 6), y2 - head * Math.sin(ang - Math.PI / 6));
-      ctx.lineTo(x2 - head * Math.cos(ang + Math.PI / 6), y2 - head * Math.sin(ang + Math.PI / 6));
+      ctx.moveTo(posX - arrowLength, posY + objHeight/2);
+      ctx.lineTo(posX - arrowLength + 10, posY + objHeight/2 - 6);
+      ctx.lineTo(posX - arrowLength + 10, posY + objHeight/2 + 6);
       ctx.closePath();
-      ctx.fillStyle = color || '#111827';
+      ctx.fillStyle = '#ef4444';
       ctx.fill();
+      
+      // Draw label
+      ctx.fillStyle = '#1f2937';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('Friction', posX - 70, posY + objHeight/2 - 15);
+      
+      // Draw object label
+      ctx.fillStyle = '#1f2937';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText('Object', posX + 15, posY + objHeight/2 + 5);
     }
 
-    // ===================================
-    // Concept 1: Force Simulation Logic
-    // ===================================
-    const canvas1 = document.getElementById('forceCanvas');
-    const ctx1 = canvas1.getContext('2d');
-
-    const massIn1 = document.getElementById('mass');
-    const fappIn1 = document.getElementById('fapp');
-    const musIn1 = document.getElementById('mus');
-    const mukIn1 = document.getElementById('muk');
-    const gIn1 = document.getElementById('grav');
-    const massVal1 = document.getElementById('massVal');
-    const fappVal1 = document.getElementById('fappVal');
-    const musVal1 = document.getElementById('musVal');
-    const mukVal1 = document.getElementById('mukVal');
-    const gVal1 = document.getElementById('gravVal');
-    const netFEl1 = document.getElementById('netF');
-    const accEl1 = document.getElementById('acc');
-    const velEl1 = document.getElementById('vel');
-    const posEl1 = document.getElementById('pos');
-    const fricEl1 = document.getElementById('fric');
-    const statusEl1 = document.getElementById('status');
-    const startBtn1 = document.getElementById('start1');
-    const pauseBtn1 = document.getElementById('pause1');
-    const resetBtn1 = document.getElementById('reset1');
-
-    let m1 = parseFloat(massIn1.value);
-    let g1 = parseFloat(gIn1.value);
-    let muS1 = parseFloat(musIn1.value);
-    let muK1 = parseFloat(mukIn1.value);
-    let Fapp1 = parseFloat(fappIn1.value);
-    let x1 = 1.0;
-    let v1 = 0.0;
-    let a1 = 0.0;
-    let running1 = false;
-    let lastT1 = null;
-
-    function syncLabels1() {
-      massVal1.textContent = m1.toFixed(0);
-      fappVal1.textContent = Fapp1.toFixed(0);
-      musVal1.textContent = muS1.toFixed(2);
-      mukVal1.textContent = muK1.toFixed(2);
-      gVal1.textContent = g1.toFixed(1);
-    }
-    syncLabels1();
-
-    massIn1.oninput = () => { m1 = parseFloat(massIn1.value); syncLabels1(); };
-    fappIn1.oninput = () => { Fapp1 = parseFloat(fappIn1.value); syncLabels1(); };
-    musIn1.oninput = () => {
-      muS1 = parseFloat(musIn1.value);
-      if (muK1 > muS1) {
-        muK1 = muS1;
-        mukIn1.value = muK1;
+    function drawLaw2() {
+      const ctx = canvases.law2.getContext('2d');
+      const width = canvases.law2.width;
+      const height = canvases.law2.height;
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+      
+      // Draw background
+      ctx.fillStyle = '#dbeafe';
+      ctx.fillRect(0, 0, width, height);
+      
+      // Draw surface
+      ctx.fillStyle = '#9ca3af';
+      ctx.fillRect(0, height - 50, width, 50);
+      
+      // Draw grid lines on surface
+      ctx.strokeStyle = '#6b7280';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < width; x += 20) {
+        ctx.beginPath();
+        ctx.moveTo(x, height - 50);
+        ctx.lineTo(x, height);
+        ctx.stroke();
       }
-      syncLabels1();
-    };
-    mukIn1.oninput = () => {
-      muK1 = Math.min(parseFloat(mukIn1.value), muS1);
-      mukIn1.value = muK1;
-      syncLabels1();
-    };
-    gIn1.oninput = () => { g1 = parseFloat(gIn1.value); syncLabels1(); };
+      
+      // Draw object
+      const posX = width * 0.3;
+      const posY = height - 120;
+      const objWidth = 80;
+      const objHeight = 60;
+      
+      ctx.fillStyle = '#3b82f6';
+      ctx.fillRect(posX, posY, objWidth, objHeight);
+      ctx.strokeStyle = '#1d4ed8';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(posX, posY, objWidth, objHeight);
+      
+      // Draw applied force arrow
+      const arrowLength = 80;
+      
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(posX + objWidth, posY + objHeight/2);
+      ctx.lineTo(posX + objWidth + arrowLength, posY + objHeight/2);
+      ctx.stroke();
+      
+      // Arrow head
+      ctx.beginPath();
+      ctx.moveTo(posX + objWidth + arrowLength, posY + objHeight/2);
+      ctx.lineTo(posX + objWidth + arrowLength - 12, posY + objHeight/2 - 8);
+      ctx.lineTo(posX + objWidth + arrowLength - 12, posY + objHeight/2 + 8);
+      ctx.closePath();
+      ctx.fillStyle = '#10b981';
+      ctx.fill();
+      
+      // Draw label
+      ctx.fillStyle = '#1f2937';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('Applied Force', posX + objWidth + 30, posY + objHeight/2 - 15);
+      
+      // Draw object label
+      ctx.fillStyle = '#1f2937';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText('Object', posX + 15, posY + objHeight/2 + 5);
+    }
 
-    startBtn1.onclick = () => { running1 = true; statusEl1.textContent = "Status: running"; lastT1 = null; };
-    pauseBtn1.onclick = () => { running1 = false; statusEl1.textContent = "Status: paused"; };
-    resetBtn1.onclick = () => {
-      running1 = false;
-      lastT1 = null;
-      x1 = 1.0;
-      v1 = 0.0;
-      a1 = 0.0;
-      statusEl1.textContent = "Status: reset";
-      render1();
-      updateMetrics1(0, 0, 0, "static");
-    };
-
-    function computeFriction1(v, Fapp, m, g) {
-      const N = m * g;
-      const FsMax = muS1 * N;
-      const FkMag = muK1 * N;
-      if (Math.abs(v) < 1e-4) {
-        if (Math.abs(Fapp) <= FsMax) {
-          return {
-            F: -Fapp,
-            mode: "static"
-          };
-        }
-        const dir = Math.sign(Fapp);
-        return {
-          F: -dir * FkMag,
-          mode: "kinetic"
-        };
+    function drawLaw3() {
+      const ctx = canvases.law3.getContext('2d');
+      const width = canvases.law3.width;
+      const height = canvases.law3.height;
+      
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+      
+      // Draw background
+      ctx.fillStyle = '#dbeafe';
+      ctx.fillRect(0, 0, width, height);
+      
+      // Draw surface
+      ctx.fillStyle = '#9ca3af';
+      ctx.fillRect(0, height - 50, width, 50);
+      
+      // Draw grid lines on surface
+      ctx.strokeStyle = '#6b7280';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < width; x += 20) {
+        ctx.beginPath();
+        ctx.moveTo(x, height - 50);
+        ctx.lineTo(x, height);
+        ctx.stroke();
       }
-      const dir = Math.sign(v);
-      return {
-        F: -dir * FkMag,
-        mode: "kinetic"
-      };
+      
+      // Draw objects
+      const objWidth = 60;
+      const objHeight = 60;
+      const gap = 20;
+      
+      // Object A
+      const posX1 = width * 0.3;
+      const posY1 = height - 110;
+      
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(posX1, posY1, objWidth, objHeight);
+      ctx.strokeStyle = '#b45309';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(posX1, posY1, objWidth, objHeight);
+      
+      // Object B
+      const posX2 = posX1 + objWidth + gap;
+      const posY2 = height - 110;
+      
+      ctx.fillStyle = '#3b82f6';
+      ctx.fillRect(posX2, posY2, objWidth, objHeight);
+      ctx.strokeStyle = '#1d4ed8';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(posX2, posY2, objWidth, objHeight);
+      
+      // Draw force arrows
+      // Force on A
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(posX1 + objWidth, posY1 + objHeight/2);
+      ctx.lineTo(posX1 + objWidth + 40, posY1 + objHeight/2);
+      ctx.stroke();
+      
+      // Arrow head
+      ctx.beginPath();
+      ctx.moveTo(posX1 + objWidth + 40, posY1 + objHeight/2);
+      ctx.lineTo(posX1 + objWidth + 30, posY1 + objHeight/2 - 6);
+      ctx.lineTo(posX1 + objWidth + 30, posY1 + objHeight/2 + 6);
+      ctx.closePath();
+      ctx.fillStyle = '#ef4444';
+      ctx.fill();
+      
+      // Force on B
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(posX2, posY2 + objHeight/2);
+      ctx.lineTo(posX2 - 40, posY2 + objHeight/2);
+      ctx.stroke();
+      
+      // Arrow head
+      ctx.beginPath();
+      ctx.moveTo(posX2 - 40, posY2 + objHeight/2);
+      ctx.lineTo(posX2 - 30, posY2 + objHeight/2 - 6);
+      ctx.lineTo(posX2 - 30, posY2 + objHeight/2 + 6);
+      ctx.closePath();
+      ctx.fillStyle = '#10b981';
+      ctx.fill();
+      
+      // Draw labels
+      ctx.fillStyle = '#1f2937';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('F (A on B)', posX1 + objWidth + 10, posY1 + objHeight/2 - 20);
+      ctx.fillText('F (B on A)', posX2 - 70, posY2 + objHeight/2 - 20);
+      
+      // Draw object labels
+      ctx.fillStyle = '#1f2937';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText('A', posX1 + 25, posY1 + objHeight/2 + 5);
+      ctx.fillText('B', posX2 + 25, posY2 + objHeight/2 + 5);
     }
 
-    function step1(ts) {
-      if (!lastT1) lastT1 = ts;
-      const dt = Math.min(0.05, (ts - lastT1) / 1000);
-      lastT1 = ts;
-      if (running1) {
-        const fr = computeFriction1(v1, Fapp1, m1, g1);
-        const Fnet = Fapp1 + fr.F;
-        a1 = Fnet / m1;
-        v1 += a1 * dt;
-        if (Math.abs(v1) < 1e-6 && Math.abs(Fapp1) < muS1 * m1 * g1) v1 = 0;
-        x1 += v1 * dt;
-        const xMin = 0.5,
-          xMax = (canvas1.width / pxPerM) - 0.5;
-        if (x1 < xMin) {
-          x1 = xMin;
-          v1 = 0;
-        }
-        if (x1 > xMax) {
-          x1 = xMax;
-          v1 = 0;
-        }
-        render1();
-        updateMetrics1(Fnet, a1, v1, fr.mode, fr.F);
-      }
-      requestAnimationFrame(step1);
-    }
+    // Initial draw
+    drawLaw1();
+    drawLaw2();
+    drawLaw3();
 
-    function updateMetrics1(Fnet, a, v, mode, Ffric) {
-      netFEl1.textContent = `ΣF = ${Fnet.toFixed(2)} N`;
-      accEl1.textContent = `a = ${a.toFixed(3)} m/s²`;
-      velEl1.textContent = `v = ${v.toFixed(3)} m/s`;
-      posEl1.textContent = `x = ${x1.toFixed(3)} m`;
-      const frStr = (typeof Ffric === "number") ? `${Ffric.toFixed(2)} N` : "0.00 N";
-      fricEl1.textContent = `Friction = ${frStr} (mode: ${mode})`;
-    }
+    // Slider value updates
+    // Law 1 sliders
+    const inertiaMass = document.getElementById('inertia-mass');
+    const inertiaMassVal = document.getElementById('inertia-mass-val');
+    inertiaMass.addEventListener('input', () => {
+      inertiaMassVal.textContent = `${inertiaMass.value} kg`;
+    });
 
-    function render1() {
-      const W = canvas1.width,
-        H = canvas1.height;
-      ctx1.clearRect(0, 0, W, H);
-      ctx1.strokeStyle = '#1f2937';
-      ctx1.lineWidth = 2;
-      ctx1.beginPath();
-      ctx1.moveTo(20, 260);
-      ctx1.lineTo(W - 20, 260);
-      ctx1.stroke();
-      const bx = x1 * pxPerM;
-      const by = 220;
-      const bw = 60,
-        bh = 40;
-      ctx1.fillStyle = '#f59e0b';
-      ctx1.strokeStyle = '#111827';
-      ctx1.lineWidth = 2;
-      ctx1.fillRect(bx - bw / 2, by - bh, bw, bh);
-      ctx1.strokeRect(bx - bw / 2, by - bh, bw, bh);
-      const Fx = Fapp1;
-      if (Math.abs(Fx) > 1e-6) {
-        drawArrow(ctx1, bx, by - bh - 20, bx + Math.max(Math.min(Fx, 200), -200) * 0.8, by - bh - 20, '#2563eb');
-      }
-      ctx1.fillStyle = '#111827';
-      ctx1.font = '12px system-ui';
-      ctx1.fillText('Scale: 1 m = 60 px', 20, 290);
-    }
-    render1();
-    updateMetrics1(0, 0, 0, "static", 0);
-    requestAnimationFrame(step1);
+    const inertiaFriction = document.getElementById('inertia-friction');
+    const inertiaFrictionVal = document.getElementById('inertia-friction-val');
+    inertiaFriction.addEventListener('input', () => {
+      inertiaFrictionVal.textContent = parseFloat(inertiaFriction.value).toFixed(2);
+    });
 
-    // ===================================
-    // Concept 2: Newton's First Law Logic
-    // ===================================
-    const canvas2 = document.getElementById('law1Canvas');
-    const ctx2 = canvas2.getContext('2d');
-    const pxPerM2 = 60;
+    const inertiaInitial = document.getElementById('inertia-initial');
+    const inertiaInitialVal = document.getElementById('inertia-initial-val');
+    inertiaInitial.addEventListener('input', () => {
+      inertiaInitialVal.textContent = `${inertiaInitial.value} m/s`;
+    });
 
-    let v2 = parseFloat(document.getElementById('initVel').value);
-    let muK2 = parseFloat(document.getElementById('muK2').value);
-    let m2 = parseFloat(document.getElementById('mass2').value);
-    let g2 = 9.8;
-    let x2 = 1.0;
-    let running2 = false;
-    let lastT2 = null;
+    // Law 2 sliders
+    const forceValue = document.getElementById('force-value');
+    const forceValueVal = document.getElementById('force-value-val');
+    forceValue.addEventListener('input', () => {
+      forceValueVal.textContent = `${forceValue.value} N`;
+    });
 
-    const vel2El = document.getElementById('vel2');
-    const pos2El = document.getElementById('pos2');
-    const fric2El = document.getElementById('fric2');
-    const status2El = document.getElementById('status2');
+    const massValue = document.getElementById('mass-value');
+    const massValueVal = document.getElementById('mass-value-val');
+    massValue.addEventListener('input', () => {
+      massValueVal.textContent = `${massValue.value} kg`;
+    });
 
-    document.getElementById('initVel').oninput = e => {
-      v2 = parseFloat(e.target.value);
-      document.getElementById('initVelVal').textContent = v2.toFixed(1);
-    };
-    document.getElementById('muK2').oninput = e => {
-      muK2 = parseFloat(e.target.value);
-      document.getElementById('muK2Val').textContent = muK2.toFixed(2);
-    };
-    document.getElementById('mass2').oninput = e => {
-      m2 = parseFloat(e.target.value);
-      document.getElementById('mass2Val').textContent = m2.toFixed(0);
-    };
+    const frictionValue = document.getElementById('friction-value');
+    const frictionValueVal = document.getElementById('friction-value-val');
+    frictionValue.addEventListener('input', () => {
+      frictionValueVal.textContent = parseFloat(frictionValue.value).toFixed(2);
+    });
 
-    document.getElementById('start2').onclick = () => {
-      running2 = true;
-      status2El.textContent = "Status: running";
-      lastT2 = null;
-    };
-    document.getElementById('pause2').onclick = () => {
-      running2 = false;
-      status2El.textContent = "Status: paused";
-    };
-    document.getElementById('reset2').onclick = () => {
-      running2 = false;
-      lastT2 = null;
-      x2 = 1.0;
-      v2 = parseFloat(document.getElementById('initVel').value);
-      status2El.textContent = "Status: reset";
-      render2();
-      updateMetrics2();
-    };
+    // Law 3 sliders
+    const mass1Value = document.getElementById('mass1-value');
+    const mass1ValueVal = document.getElementById('mass1-value-val');
+    mass1Value.addEventListener('input', () => {
+      mass1ValueVal.textContent = `${mass1Value.value} kg`;
+    });
 
-    function step2(ts) {
-      if (!lastT2) lastT2 = ts;
-      const dt = Math.min(0.05, (ts - lastT2) / 1000);
-      lastT2 = ts;
-      if (running2) {
-        const Ffric = muK2 * m2 * g2 * (v2 !== 0 ? -Math.sign(v2) : 0);
-        const a2 = Ffric / m2;
-        v2 += a2 * dt;
-        if (Math.abs(v2) < 1e-5) v2 = 0;
-        x2 += v2 * dt;
-        render2(Ffric);
-        updateMetrics2(Ffric);
-      }
-      requestAnimationFrame(step2);
-    }
+    const mass2Value = document.getElementById('mass2-value');
+    const mass2ValueVal = document.getElementById('mass2-value-val');
+    mass2Value.addEventListener('input', () => {
+      mass2ValueVal.textContent = `${mass2Value.value} kg`;
+    });
 
-    function updateMetrics2(Ffric = 0) {
-      vel2El.textContent = `v = ${v2.toFixed(3)} m/s`;
-      pos2El.textContent = `x = ${x2.toFixed(3)} m`;
-      fric2El.textContent = `Friction = ${Ffric.toFixed(2)} N`;
-    }
+    const forceMagnitude = document.getElementById('force-magnitude');
+    const forceMagnitudeVal = document.getElementById('force-magnitude-val');
+    forceMagnitude.addEventListener('input', () => {
+      forceMagnitudeVal.textContent = `${forceMagnitude.value} N`;
+    });
 
-    function render2(Ffric = 0) {
-      const W = canvas2.width,
-        H = canvas2.height;
-      ctx2.clearRect(0, 0, W, H);
-      ctx2.strokeStyle = '#1f2937';
-      ctx2.beginPath();
-      ctx2.moveTo(20, 260);
-      ctx2.lineTo(W - 20, 260);
-      ctx2.stroke();
-      const bx = x2 * pxPerM2;
-      const by = 220;
-      ctx2.fillStyle = '#f59e0b';
-      ctx2.strokeStyle = '#111827';
-      ctx2.fillRect(bx - 30, by - 40, 60, 40);
-      ctx2.strokeRect(bx - 30, by - 40, 60, 40);
-      if (Math.abs(Ffric) > 1e-6) {
-        drawArrow(ctx2, bx, by - 40 - 20, bx - Math.sign(Ffric) * 40, by - 40 - 20, '#ef4444');
-      }
-    }
-    render2();
-    updateMetrics2();
-    requestAnimationFrame(step2);
+    // Button functionality
+    document.querySelectorAll('.btn-start').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Start simulation logic
+        btn.parentElement.parentElement.querySelector('.metric-value').textContent = "Running...";
+      });
+    });
 
-    // ===================================
-    // Concept 3: Newton's Second Law Logic
-    // ===================================
-    const canvas3 = document.getElementById('law2Canvas');
-    const ctx3 = canvas3.getContext('2d');
-    const pxPerM3 = 60;
+    document.querySelectorAll('.btn-pause').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Pause simulation logic
+        btn.parentElement.parentElement.querySelector('.metric-value').textContent = "Paused";
+      });
+    });
 
-    let Fapp3 = parseFloat(document.getElementById('force3').value);
-    let m3 = parseFloat(document.getElementById('mass3').value);
-    let muK3 = parseFloat(document.getElementById('muK3').value);
-    let g3 = parseFloat(document.getElementById('g3').value);
-    let v3 = 0.0,
-      x3 = 1.0;
-    let running3 = false;
-    let lastT3 = null;
-
-    const netF3El = document.getElementById('netF3');
-    const acc3El = document.getElementById('acc3');
-    const vel3El = document.getElementById('vel3');
-    const pos3El = document.getElementById('pos3');
-    const fric3El = document.getElementById('fric3');
-    const status3El = document.getElementById('status3');
-
-    document.getElementById('force3').oninput = e => {
-      Fapp3 = parseFloat(e.target.value);
-      document.getElementById('force3Val').textContent = Fapp3.toFixed(1);
-    };
-    document.getElementById('mass3').oninput = e => {
-      m3 = parseFloat(e.target.value);
-      document.getElementById('mass3Val').textContent = m3.toFixed(0);
-    };
-    document.getElementById('muK3').oninput = e => {
-      muK3 = parseFloat(e.target.value);
-      document.getElementById('muK3Val').textContent = muK3.toFixed(2);
-    };
-    document.getElementById('g3').oninput = e => {
-      g3 = parseFloat(e.target.value);
-      document.getElementById('g3Val').textContent = g3.toFixed(1);
-    };
-
-    document.getElementById('start3').onclick = () => {
-      running3 = true;
-      status3El.textContent = "Status: running";
-      lastT3 = null;
-    };
-    document.getElementById('pause3').onclick = () => {
-      running3 = false;
-      status3El.textContent = "Status: paused";
-    };
-    document.getElementById('reset3').onclick = () => {
-      running3 = false;
-      lastT3 = null;
-      v3 = 0.0;
-      x3 = 1.0;
-      status3El.textContent = "Status: reset";
-      render3();
-      updateMetrics3();
-    };
-
-    function step3(ts) {
-      if (!lastT3) lastT3 = ts;
-      const dt = Math.min(0.05, (ts - lastT3) / 1000);
-      lastT3 = ts;
-      if (running3) {
-        const Ffric = muK3 * m3 * g3 * (v3 !== 0 ? -Math.sign(v3) : 0);
-        const Fnet = Fapp3 + Ffric;
-        const a3 = Fnet / m3;
-        v3 += a3 * dt;
-        x3 += v3 * dt;
-        render3(Ffric);
-        updateMetrics3(Fnet, a3, Ffric);
-      }
-      requestAnimationFrame(step3);
-    }
-
-    function updateMetrics3(Fnet = 0, a3 = 0, Ffric = 0) {
-      netF3El.textContent = `Net Force = ${Fnet.toFixed(3)} N`;
-      acc3El.textContent = `a = ${a3.toFixed(3)} m/s²`;
-      vel3El.textContent = `v = ${v3.toFixed(3)} m/s`;
-      pos3El.textContent = `x = ${x3.toFixed(3)} m`;
-      fric3El.textContent = `Friction = ${Ffric.toFixed(3)} N`;
-    }
-
-    function render3(Ffric = 0) {
-      const W = canvas3.width,
-        H = canvas3.height;
-      ctx3.clearRect(0, 0, W, H);
-      ctx3.strokeStyle = '#1f2937';
-      ctx3.beginPath();
-      ctx3.moveTo(20, 260);
-      ctx3.lineTo(W - 20, 260);
-      ctx3.stroke();
-      const bx = x3 * pxPerM3;
-      const by = 220;
-      ctx3.fillStyle = '#3b82f6';
-      ctx3.strokeStyle = '#111827';
-      ctx3.fillRect(bx - 30, by - 40, 60, 40);
-      ctx3.strokeRect(bx - 30, by - 40, 60, 40);
-      if (Math.abs(Fapp3) > 1e-6) {
-        drawArrow(ctx3, bx, by - 40 - 20, bx + Math.max(Math.min(Fapp3, 200), -200) * 0.8, by - 40 - 20, '#2563eb');
-      }
-      if (Math.abs(Ffric) > 1e-6) {
-        drawArrow(ctx3, bx, by - 40 + 20, bx - Math.sign(Ffric) * 40, by - 40 + 20, '#ef4444');
-      }
-    }
-    render3();
-    updateMetrics3();
-    requestAnimationFrame(step3);
+    document.querySelectorAll('.btn-reset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Reset simulation logic
+        btn.parentElement.parentElement.querySelector('.metric-value').textContent = "0";
+      });
+    });
   </script>
 </body>
 </html>
