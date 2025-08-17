@@ -6,16 +6,16 @@
   <title>Newton's Laws Simulator</title>
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --secondary: #4b5563;
-      --light: #f3f4f6;
-      --lighter: #f9fafb;
-      --dark: #1f2937;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --primary: #4361ee;
+      --primary-dark: #3a0ca3;
+      --secondary: #4cc9f0;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4ade80;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --surface: #64748b;
+      --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       --transition: all 0.3s ease;
     }
 
@@ -27,11 +27,12 @@
 
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: linear-gradient(135deg, #f0f4f8, #dbeafe);
+      background: linear-gradient(135deg, #e0f2fe, #dbeafe);
       color: var(--dark);
       line-height: 1.6;
       min-height: 100vh;
       padding: 20px;
+      overflow-x: hidden;
     }
 
     .container {
@@ -41,8 +42,8 @@
 
     header {
       text-align: center;
-      padding: 30px 0;
-      margin-bottom: 30px;
+      padding: 20px 0;
+      margin-bottom: 20px;
     }
 
     h1 {
@@ -50,13 +51,17 @@
       margin-bottom: 10px;
       color: var(--primary-dark);
       text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+      background: linear-gradient(45deg, #3a0ca3, #4361ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .subtitle {
       font-size: 1.2rem;
-      color: var(--secondary);
+      color: var(--dark);
       max-width: 800px;
       margin: 0 auto;
+      padding: 0 20px;
     }
 
     .tabs {
@@ -64,11 +69,11 @@
       justify-content: center;
       margin-bottom: 30px;
       flex-wrap: wrap;
+      gap: 12px;
     }
 
     .tab-btn {
-      padding: 12px 24px;
-      margin: 0 8px;
+      padding: 14px 28px;
       background: white;
       border: 2px solid var(--primary);
       border-radius: 50px;
@@ -78,18 +83,35 @@
       transition: var(--transition);
       color: var(--primary);
       box-shadow: var(--card-shadow);
+      display: flex;
+      align-items: center;
     }
 
     .tab-btn:hover {
       background: var(--primary);
       color: white;
       transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(67, 97, 238, 0.3);
     }
 
     .tab-btn.active {
       background: var(--primary);
       color: white;
-      box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 6px 12px rgba(67, 97, 238, 0.25);
+    }
+
+    .law-icon {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      background: white;
+      color: var(--primary);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      text-align: center;
+      font-weight: bold;
+      margin-right: 10px;
     }
 
     .content-section {
@@ -99,16 +121,16 @@
       overflow: hidden;
       margin-bottom: 30px;
       display: none;
+      border: 1px solid #e5e7eb;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
     }
 
     .content-section.active {
       display: block;
-      animation: fadeIn 0.5s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .concept-header {
@@ -136,7 +158,7 @@
     }
 
     .explanation {
-      background: var(--lighter);
+      background: var(--light);
       border-radius: 12px;
       padding: 20px;
       box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
@@ -146,6 +168,8 @@
       color: var(--primary);
       margin-bottom: 15px;
       font-size: 1.4rem;
+      border-bottom: 2px solid #dbeafe;
+      padding-bottom: 10px;
     }
 
     .law-formula {
@@ -158,6 +182,7 @@
       margin: 15px 0;
       color: var(--primary-dark);
       border-left: 4px solid var(--primary);
+      font-family: 'Courier New', monospace;
     }
 
     .simulation-area {
@@ -173,16 +198,17 @@
       margin-bottom: 20px;
       position: relative;
       border: 2px solid var(--primary);
+      height: 320px;
     }
 
     canvas {
       display: block;
       width: 100%;
-      height: 300px;
+      height: 100%;
     }
 
     .controls {
-      background: var(--lighter);
+      background: var(--light);
       border-radius: 12px;
       padding: 20px;
       box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
@@ -196,13 +222,13 @@
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
-      color: var(--secondary);
+      color: var(--dark);
     }
 
     input[type="range"] {
       width: 100%;
       height: 8px;
-      background: #d1d5db;
+      background: #cbd5e1;
       border-radius: 4px;
       outline: none;
       -webkit-appearance: none;
@@ -216,6 +242,7 @@
       border-radius: 50%;
       cursor: pointer;
       transition: var(--transition);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
     input[type="range"]::-webkit-slider-thumb:hover {
@@ -227,7 +254,7 @@
       display: flex;
       justify-content: space-between;
       margin-top: 5px;
-      color: var(--secondary);
+      color: var(--dark);
       font-size: 0.9rem;
     }
 
@@ -250,6 +277,7 @@
 
     button:active {
       transform: translateY(2px);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
 
     .btn-start {
@@ -303,27 +331,15 @@
 
     .metric-label {
       font-size: 0.9rem;
-      color: #9ca3af;
+      color: #94a3b8;
     }
 
     footer {
       text-align: center;
       padding: 30px 0;
-      color: var(--secondary);
+      color: var(--dark);
       font-size: 0.9rem;
-    }
-
-    .law-icon {
-      display: inline-block;
-      background: var(--primary);
-      color: white;
-      width: 36px;
-      height: 36px;
-      line-height: 36px;
-      border-radius: 50%;
-      text-align: center;
-      font-weight: bold;
-      margin-right: 10px;
+      margin-top: 20px;
     }
 
     .examples {
@@ -337,6 +353,13 @@
     .examples h4 {
       color: var(--warning);
       margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .examples h4:before {
+      content: "✨";
+      margin-right: 8px;
     }
 
     .examples ul {
@@ -345,20 +368,79 @@
 
     .examples li {
       margin-bottom: 8px;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .examples li:before {
+      content: "•";
+      color: var(--warning);
+      position: absolute;
+      left: 0;
+      font-size: 1.2rem;
+    }
+
+    .scale-indicator {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    .boundary-indicator {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: none;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transform: translateX(200%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+    
+    .notification.show {
+      transform: translateX(0);
     }
   </style>
 </head>
 <body>
+  <div class="notification" id="notification">Simulation started! Adjust parameters to see changes.</div>
+  
   <div class="container">
     <header>
       <h1>Newton's Laws of Motion</h1>
-      <p class="subtitle">Explore the fundamental principles that govern motion through interactive simulations. Adjust parameters and observe how objects behave under different conditions.</p>
+      <p class="subtitle">Interactive physics simulator demonstrating Newton's three laws with realistic animations</p>
     </header>
 
     <div class="tabs">
-      <button class="tab-btn active" data-tab="law1"><span class="law-icon">1</span> Law of Inertia</button>
-      <button class="tab-btn" data-tab="law2"><span class="law-icon">2</span> F=ma</button>
-      <button class="tab-btn" data-tab="law3"><span class="law-icon">3</span> Action-Reaction</button>
+      <button class="tab-btn active" data-tab="law1">
+        <span class="law-icon">1</span> Law of Inertia
+      </button>
+      <button class="tab-btn" data-tab="law2">
+        <span class="law-icon">2</span> F=ma
+      </button>
+      <button class="tab-btn" data-tab="law3">
+        <span class="law-icon">3</span> Action-Reaction
+      </button>
     </div>
 
     <!-- Law 1: Inertia -->
@@ -395,7 +477,9 @@
         
         <div class="simulation-area">
           <div class="canvas-container">
-            <canvas id="canvas1"></canvas>
+            <canvas id="canvas1" width="800" height="320"></canvas>
+            <div class="scale-indicator">Scale: 1m = 50px</div>
+            <div class="boundary-indicator" id="boundary1">Object reached boundary!</div>
           </div>
           
           <div class="controls">
@@ -430,9 +514,9 @@
             </div>
             
             <div class="buttons">
-              <button class="btn-start">Start</button>
-              <button class="btn-pause">Pause</button>
-              <button class="btn-reset">Reset</button>
+              <button id="start1" class="btn-start">Start</button>
+              <button id="pause1" class="btn-pause">Pause</button>
+              <button id="reset1" class="btn-reset">Reset</button>
             </div>
           </div>
           
@@ -441,19 +525,19 @@
             <div class="metric-grid">
               <div class="metric-card">
                 <div class="metric-label">Velocity</div>
-                <div class="metric-value" id="velocity1">0 m/s</div>
+                <div class="metric-value" id="velocity1">0.00 m/s</div>
               </div>
               <div class="metric-card">
                 <div class="metric-label">Position</div>
-                <div class="metric-value" id="position1">0 m</div>
+                <div class="metric-value" id="position1">0.00 m</div>
               </div>
               <div class="metric-card">
                 <div class="metric-label">Friction Force</div>
-                <div class="metric-value" id="friction1">0 N</div>
+                <div class="metric-value" id="friction1">0.00 N</div>
               </div>
               <div class="metric-card">
                 <div class="metric-label">Time</div>
-                <div class="metric-value" id="time1">0 s</div>
+                <div class="metric-value" id="time1">0.00 s</div>
               </div>
             </div>
           </div>
@@ -495,7 +579,9 @@
         
         <div class="simulation-area">
           <div class="canvas-container">
-            <canvas id="canvas2"></canvas>
+            <canvas id="canvas2" width="800" height="320"></canvas>
+            <div class="scale-indicator">Scale: 1m = 50px</div>
+            <div class="boundary-indicator" id="boundary2">Object reached boundary!</div>
           </div>
           
           <div class="controls">
@@ -530,9 +616,9 @@
             </div>
             
             <div class="buttons">
-              <button class="btn-start">Start</button>
-              <button class="btn-pause">Pause</button>
-              <button class="btn-reset">Reset</button>
+              <button id="start2" class="btn-start">Start</button>
+              <button id="pause2" class="btn-pause">Pause</button>
+              <button id="reset2" class="btn-reset">Reset</button>
             </div>
           </div>
           
@@ -541,19 +627,19 @@
             <div class="metric-grid">
               <div class="metric-card">
                 <div class="metric-label">Acceleration</div>
-                <div class="metric-value" id="acceleration2">0 m/s²</div>
+                <div class="metric-value" id="acceleration2">0.00 m/s²</div>
               </div>
               <div class="metric-card">
                 <div class="metric-label">Velocity</div>
-                <div class="metric-value" id="velocity2">0 m/s</div>
+                <div class="metric-value" id="velocity2">0.00 m/s</div>
               </div>
               <div class="metric-card">
                 <div class="metric-label">Net Force</div>
-                <div class="metric-value" id="netforce2">0 N</div>
+                <div class="metric-value" id="netforce2">0.00 N</div>
               </div>
               <div class="metric-card">
                 <div class="metric-label">Time</div>
-                <div class="metric-value" id="time2">0 s</div>
+                <div class="metric-value" id="time2">0.00 s</div>
               </div>
             </div>
           </div>
@@ -595,7 +681,9 @@
         
         <div class="simulation-area">
           <div class="canvas-container">
-            <canvas id="canvas3"></canvas>
+            <canvas id="canvas3" width="800" height="320"></canvas>
+            <div class="scale-indicator">Scale: 1m = 50px</div>
+            <div class="boundary-indicator" id="boundary3">Object reached boundary!</div>
           </div>
           
           <div class="controls">
@@ -630,9 +718,9 @@
             </div>
             
             <div class="buttons">
-              <button class="btn-start">Start</button>
-              <button class="btn-pause">Pause</button>
-              <button class="btn-reset">Reset</button>
+              <button id="start3" class="btn-start">Start</button>
+              <button id="pause3" class="btn-pause">Pause</button>
+              <button id="reset3" class="btn-reset">Reset</button>
             </div>
           </div>
           
@@ -641,19 +729,19 @@
             <div class="metric-grid">
               <div class="metric-card">
                 <div class="metric-label">Force on A</div>
-                <div class="metric-value" id="forceA">0 N</div>
+                <div class="metric-value" id="forceA">0.00 N</div>
               </div>
               <div class="metric-card">
                 <div class="metric-label">Force on B</div>
-                <div class="metric-value" id="forceB">0 N</div>
+                <div class="metric-value" id="forceB">0.00 N</div>
               </div>
               <div class="metric-card">
                 <div class="metric-label">Acceleration A</div>
-                <div class="metric-value" id="accelerationA">0 m/s²</div>
+                <div class="metric-value" id="accelerationA">0.00 m/s²</div>
               </div>
               <div class="metric-card">
                 <div class="metric-label">Acceleration B</div>
-                <div class="metric-value" id="accelerationB">0 m/s²</div>
+                <div class="metric-value" id="accelerationB">0.00 m/s²</div>
               </div>
             </div>
           </div>
@@ -686,347 +774,771 @@
       });
     });
 
-    // Initialize canvas elements
-    const canvases = {
-      law1: document.getElementById('canvas1'),
-      law2: document.getElementById('canvas2'),
-      law3: document.getElementById('canvas3')
-    };
-
-    // Setup canvas contexts
-    const ctx = {
-      law1: canvases.law1.getContext('2d'),
-      law2: canvases.law2.getContext('2d'),
-      law3: canvases.law3.getContext('2d')
-    };
-
-    // Set canvas dimensions
-    for (const key in canvases) {
-      canvases[key].width = canvases[key].clientWidth;
-      canvases[key].height = canvases[key].clientHeight;
+    // Physics constants
+    const PIXELS_PER_METER = 50;
+    const GRAVITY = 9.8;
+    
+    // Notification system
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
     }
 
-    // Draw functions for each law
-    function drawLaw1() {
-      const ctx = canvases.law1.getContext('2d');
-      const width = canvases.law1.width;
-      const height = canvases.law1.height;
-      
-      // Clear canvas
-      ctx.clearRect(0, 0, width, height);
-      
-      // Draw background
-      ctx.fillStyle = '#dbeafe';
-      ctx.fillRect(0, 0, width, height);
-      
-      // Draw surface
-      ctx.fillStyle = '#9ca3af';
-      ctx.fillRect(0, height - 50, width, 50);
-      
-      // Draw grid lines on surface
-      ctx.strokeStyle = '#6b7280';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < width; x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, height - 50);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      
-      // Draw object
-      const posX = width * 0.3;
-      const posY = height - 120;
-      const objWidth = 80;
-      const objHeight = 60;
-      
-      ctx.fillStyle = '#f59e0b';
-      ctx.fillRect(posX, posY, objWidth, objHeight);
-      ctx.strokeStyle = '#b45309';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(posX, posY, objWidth, objHeight);
-      
-      // Draw arrows
-      const arrowLength = 60;
-      
-      // Friction arrow
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(posX + 10, posY + objHeight/2);
-      ctx.lineTo(posX - arrowLength, posY + objHeight/2);
-      ctx.stroke();
-      
-      // Arrow head
-      ctx.beginPath();
-      ctx.moveTo(posX - arrowLength, posY + objHeight/2);
-      ctx.lineTo(posX - arrowLength + 10, posY + objHeight/2 - 6);
-      ctx.lineTo(posX - arrowLength + 10, posY + objHeight/2 + 6);
-      ctx.closePath();
-      ctx.fillStyle = '#ef4444';
-      ctx.fill();
-      
-      // Draw label
-      ctx.fillStyle = '#1f2937';
-      ctx.font = '14px sans-serif';
-      ctx.fillText('Friction', posX - 70, posY + objHeight/2 - 15);
-      
-      // Draw object label
-      ctx.fillStyle = '#1f2937';
-      ctx.font = 'bold 16px sans-serif';
-      ctx.fillText('Object', posX + 15, posY + objHeight/2 + 5);
+    // Boundary indicator system
+    function showBoundaryIndicator(canvasId) {
+      const indicator = document.getElementById(`boundary${canvasId}`);
+      indicator.style.display = 'block';
+      setTimeout(() => {
+        indicator.style.display = 'none';
+      }, 3000);
     }
 
-    function drawLaw2() {
-      const ctx = canvases.law2.getContext('2d');
-      const width = canvases.law2.width;
-      const height = canvases.law2.height;
+    // =====================
+    // Law 1: Inertia Simulation
+    // =====================
+    const canvas1 = document.getElementById('canvas1');
+    const ctx1 = canvas1.getContext('2d');
+    let inertiaSimulation = {
+      mass: 5,
+      friction: 0.1,
+      initialVelocity: 10,
+      position: 1,
+      velocity: 0,
+      frictionForce: 0,
+      time: 0,
+      running: false,
+      animationId: null,
+      lastTime: 0,
+      boundaryReached: false
+    };
+
+    function renderInertia() {
+      const width = canvas1.width;
+      const height = canvas1.height;
+      const surfaceHeight = 50;
       
       // Clear canvas
-      ctx.clearRect(0, 0, width, height);
+      ctx1.clearRect(0, 0, width, height);
       
       // Draw background
-      ctx.fillStyle = '#dbeafe';
-      ctx.fillRect(0, 0, width, height);
+      ctx1.fillStyle = '#dbeafe';
+      ctx1.fillRect(0, 0, width, height);
       
       // Draw surface
-      ctx.fillStyle = '#9ca3af';
-      ctx.fillRect(0, height - 50, width, 50);
+      ctx1.fillStyle = '#94a3b8';
+      ctx1.fillRect(0, height - surfaceHeight, width, surfaceHeight);
       
-      // Draw grid lines on surface
-      ctx.strokeStyle = '#6b7280';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < width; x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, height - 50);
-        ctx.lineTo(x, height);
-        ctx.stroke();
+      // Draw grid lines and distance markers
+      ctx1.strokeStyle = '#64748b';
+      ctx1.lineWidth = 1;
+      ctx1.fillStyle = '#334155';
+      ctx1.font = '12px Arial';
+      ctx1.textAlign = 'center';
+      
+      for (let x = 0; x < width; x += PIXELS_PER_METER) {
+        ctx1.beginPath();
+        ctx1.moveTo(x, height - surfaceHeight);
+        ctx1.lineTo(x, height - surfaceHeight + 10);
+        ctx1.stroke();
+        
+        const meters = x / PIXELS_PER_METER;
+        ctx1.fillText(`${meters}m`, x, height - surfaceHeight + 25);
       }
       
-      // Draw object
-      const posX = width * 0.3;
-      const posY = height - 120;
-      const objWidth = 80;
-      const objHeight = 60;
+      // Draw the bus
+      const busWidth = 120;
+      const busHeight = 60;
+      const busX = inertiaSimulation.position * PIXELS_PER_METER - busWidth/2;
+      const busY = height - surfaceHeight - busHeight;
       
-      ctx.fillStyle = '#3b82f6';
-      ctx.fillRect(posX, posY, objWidth, objHeight);
-      ctx.strokeStyle = '#1d4ed8';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(posX, posY, objWidth, objHeight);
+      // Bus body
+      ctx1.fillStyle = '#f59e0b';
+      ctx1.fillRect(busX, busY, busWidth, busHeight);
+      
+      // Bus details
+      ctx1.fillStyle = '#b45309';
+      ctx1.fillRect(busX + 10, busY + 10, 30, 20); // Window
+      ctx1.fillRect(busX + 50, busY + 10, 30, 20); // Window
+      ctx1.fillRect(busX + 90, busY + 10, 20, 20); // Window
+      
+      // Wheels
+      ctx1.fillStyle = '#1e293b';
+      ctx1.beginPath();
+      ctx1.arc(busX + 30, busY + busHeight, 10, 0, Math.PI * 2);
+      ctx1.fill();
+      ctx1.beginPath();
+      ctx1.arc(busX + busWidth - 30, busY + busHeight, 10, 0, Math.PI * 2);
+      ctx1.fill();
+      
+      // Draw friction arrow if moving
+      if (inertiaSimulation.velocity !== 0) {
+        ctx1.strokeStyle = '#ef4444';
+        ctx1.lineWidth = 3;
+        ctx1.beginPath();
+        ctx1.moveTo(busX + busWidth/2, busY + busHeight/2);
+        ctx1.lineTo(busX + busWidth/2 - 60, busY + busHeight/2);
+        ctx1.stroke();
+        
+        // Arrow head
+        ctx1.fillStyle = '#ef4444';
+        ctx1.beginPath();
+        ctx1.moveTo(busX + busWidth/2 - 60, busY + busHeight/2);
+        ctx1.lineTo(busX + busWidth/2 - 50, busY + busHeight/2 - 6);
+        ctx1.lineTo(busX + busWidth/2 - 50, busY + busHeight/2 + 6);
+        ctx1.closePath();
+        ctx1.fill();
+        
+        // Label
+        ctx1.fillStyle = '#1f2937';
+        ctx1.font = '14px Arial';
+        ctx1.fillText('Friction', busX + busWidth/2 - 70, busY + busHeight/2 - 15);
+      }
+    }
+
+    function updateInertiaSimulation(timestamp) {
+      if (!inertiaSimulation.running) return;
+      
+      if (!inertiaSimulation.lastTime) inertiaSimulation.lastTime = timestamp;
+      const deltaTime = (timestamp - inertiaSimulation.lastTime) / 1000;
+      inertiaSimulation.lastTime = timestamp;
+      
+      // Calculate friction force
+      const normalForce = inertiaSimulation.mass * GRAVITY;
+      inertiaSimulation.frictionForce = inertiaSimulation.friction * normalForce;
+      
+      // Calculate acceleration (friction opposes motion)
+      const acceleration = -inertiaSimulation.frictionForce / inertiaSimulation.mass;
+      
+      // Update velocity and position
+      inertiaSimulation.velocity += acceleration * deltaTime;
+      
+      // Stop if velocity is very small
+      if (Math.abs(inertiaSimulation.velocity) < 0.05) {
+        inertiaSimulation.velocity = 0;
+        inertiaSimulation.frictionForce = 0;
+      }
+      
+      inertiaSimulation.position += inertiaSimulation.velocity * deltaTime;
+      
+      // Boundary check - stop simulation at boundaries
+      const minX = 0.5;
+      const maxX = canvas1.width / PIXELS_PER_METER - 1.5;
+      
+      if (inertiaSimulation.position < minX) {
+        inertiaSimulation.position = minX;
+        inertiaSimulation.velocity = 0;
+        inertiaSimulation.running = false;
+        inertiaSimulation.boundaryReached = true;
+        showBoundaryIndicator('1');
+      }
+      
+      if (inertiaSimulation.position > maxX) {
+        inertiaSimulation.position = maxX;
+        inertiaSimulation.velocity = 0;
+        inertiaSimulation.running = false;
+        inertiaSimulation.boundaryReached = true;
+        showBoundaryIndicator('1');
+      }
+      
+      // Only update time if not at boundary
+      if (!inertiaSimulation.boundaryReached) {
+        inertiaSimulation.time += deltaTime;
+      }
+      
+      // Update metrics
+      document.getElementById('velocity1').textContent = inertiaSimulation.velocity.toFixed(2) + ' m/s';
+      document.getElementById('position1').textContent = inertiaSimulation.position.toFixed(2) + ' m';
+      document.getElementById('friction1').textContent = inertiaSimulation.frictionForce.toFixed(2) + ' N';
+      document.getElementById('time1').textContent = inertiaSimulation.time.toFixed(2) + ' s';
+      
+      // Render
+      renderInertia();
+      
+      if (inertiaSimulation.running) {
+        inertiaSimulation.animationId = requestAnimationFrame(updateInertiaSimulation);
+      }
+    }
+
+    // Set up Law 1 controls
+    document.getElementById('inertia-mass').addEventListener('input', function() {
+      inertiaSimulation.mass = parseFloat(this.value);
+      document.getElementById('inertia-mass-val').textContent = this.value + ' kg';
+    });
+    
+    document.getElementById('inertia-friction').addEventListener('input', function() {
+      inertiaSimulation.friction = parseFloat(this.value);
+      document.getElementById('inertia-friction-val').textContent = parseFloat(this.value).toFixed(2);
+    });
+    
+    document.getElementById('inertia-initial').addEventListener('input', function() {
+      inertiaSimulation.initialVelocity = parseFloat(this.value);
+      document.getElementById('inertia-initial-val').textContent = this.value + ' m/s';
+    });
+    
+    document.getElementById('start1').addEventListener('click', function() {
+      if (!inertiaSimulation.running) {
+        inertiaSimulation.running = true;
+        inertiaSimulation.lastTime = 0;
+        inertiaSimulation.boundaryReached = false;
+        if (inertiaSimulation.velocity === 0) {
+          inertiaSimulation.velocity = inertiaSimulation.initialVelocity;
+        }
+        requestAnimationFrame(updateInertiaSimulation);
+        showNotification("Inertia simulation started! The bus will slow down due to friction.");
+      }
+    });
+    
+    document.getElementById('pause1').addEventListener('click', function() {
+      inertiaSimulation.running = false;
+      if (inertiaSimulation.animationId) {
+        cancelAnimationFrame(inertiaSimulation.animationId);
+      }
+      showNotification("Simulation paused");
+    });
+    
+    document.getElementById('reset1').addEventListener('click', function() {
+      inertiaSimulation.running = false;
+      inertiaSimulation.boundaryReached = false;
+      if (inertiaSimulation.animationId) {
+        cancelAnimationFrame(inertiaSimulation.animationId);
+      }
+      inertiaSimulation.position = 1;
+      inertiaSimulation.velocity = 0;
+      inertiaSimulation.frictionForce = 0;
+      inertiaSimulation.time = 0;
+      
+      document.getElementById('velocity1').textContent = '0.00 m/s';
+      document.getElementById('position1').textContent = '0.00 m';
+      document.getElementById('friction1').textContent = '0.00 N';
+      document.getElementById('time1').textContent = '0.00 s';
+      
+      renderInertia();
+      showNotification("Simulation reset");
+    });
+
+    // Initial render
+    renderInertia();
+
+    // =====================
+    // Law 2: F=ma Simulation
+    // =====================
+    const canvas2 = document.getElementById('canvas2');
+    const ctx2 = canvas2.getContext('2d');
+    let fmaSimulation = {
+      mass: 10,
+      force: 50,
+      friction: 0.1,
+      position: 1,
+      velocity: 0,
+      acceleration: 0,
+      frictionForce: 0,
+      netForce: 0,
+      time: 0,
+      running: false,
+      animationId: null,
+      lastTime: 0,
+      boundaryReached: false
+    };
+
+    function renderFma() {
+      const width = canvas2.width;
+      const height = canvas2.height;
+      const surfaceHeight = 50;
+      
+      // Clear canvas
+      ctx2.clearRect(0, 0, width, height);
+      
+      // Draw background
+      ctx2.fillStyle = '#dbeafe';
+      ctx2.fillRect(0, 0, width, height);
+      
+      // Draw surface
+      ctx2.fillStyle = '#94a3b8';
+      ctx2.fillRect(0, height - surfaceHeight, width, surfaceHeight);
+      
+      // Draw grid lines and distance markers
+      ctx2.strokeStyle = '#64748b';
+      ctx2.lineWidth = 1;
+      ctx2.fillStyle = '#334155';
+      ctx2.font = '12px Arial';
+      ctx2.textAlign = 'center';
+      
+      for (let x = 0; x < width; x += PIXELS_PER_METER) {
+        ctx2.beginPath();
+        ctx2.moveTo(x, height - surfaceHeight);
+        ctx2.lineTo(x, height - surfaceHeight + 10);
+        ctx2.stroke();
+        
+        const meters = x / PIXELS_PER_METER;
+        ctx2.fillText(`${meters}m`, x, height - surfaceHeight + 25);
+      }
+      
+      // Draw the car
+      const carWidth = 100;
+      const carHeight = 50;
+      const carX = fmaSimulation.position * PIXELS_PER_METER - carWidth/2;
+      const carY = height - surfaceHeight - carHeight;
+      
+      // Car body
+      ctx2.fillStyle = '#3b82f6';
+      ctx2.fillRect(carX, carY, carWidth, carHeight);
+      
+      // Car details
+      ctx2.fillStyle = '#1d4ed8';
+      ctx2.fillRect(carX + 70, carY + 10, 20, 15); // Window
+      ctx2.fillRect(carX + 10, carY + 10, 50, 15); // Window
+      
+      // Wheels
+      ctx2.fillStyle = '#1e293b';
+      ctx2.beginPath();
+      ctx2.arc(carX + 25, carY + carHeight, 8, 0, Math.PI * 2);
+      ctx2.fill();
+      ctx2.beginPath();
+      ctx2.arc(carX + carWidth - 25, carY + carHeight, 8, 0, Math.PI * 2);
+      ctx2.fill();
       
       // Draw applied force arrow
-      const arrowLength = 80;
-      
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 4;
-      ctx.beginPath();
-      ctx.moveTo(posX + objWidth, posY + objHeight/2);
-      ctx.lineTo(posX + objWidth + arrowLength, posY + objHeight/2);
-      ctx.stroke();
-      
-      // Arrow head
-      ctx.beginPath();
-      ctx.moveTo(posX + objWidth + arrowLength, posY + objHeight/2);
-      ctx.lineTo(posX + objWidth + arrowLength - 12, posY + objHeight/2 - 8);
-      ctx.lineTo(posX + objWidth + arrowLength - 12, posY + objHeight/2 + 8);
-      ctx.closePath();
-      ctx.fillStyle = '#10b981';
-      ctx.fill();
-      
-      // Draw label
-      ctx.fillStyle = '#1f2937';
-      ctx.font = '14px sans-serif';
-      ctx.fillText('Applied Force', posX + objWidth + 30, posY + objHeight/2 - 15);
-      
-      // Draw object label
-      ctx.fillStyle = '#1f2937';
-      ctx.font = 'bold 16px sans-serif';
-      ctx.fillText('Object', posX + 15, posY + objHeight/2 + 5);
-    }
-
-    function drawLaw3() {
-      const ctx = canvases.law3.getContext('2d');
-      const width = canvases.law3.width;
-      const height = canvases.law3.height;
-      
-      // Clear canvas
-      ctx.clearRect(0, 0, width, height);
-      
-      // Draw background
-      ctx.fillStyle = '#dbeafe';
-      ctx.fillRect(0, 0, width, height);
-      
-      // Draw surface
-      ctx.fillStyle = '#9ca3af';
-      ctx.fillRect(0, height - 50, width, 50);
-      
-      // Draw grid lines on surface
-      ctx.strokeStyle = '#6b7280';
-      ctx.lineWidth = 1;
-      for (let x = 0; x < width; x += 20) {
-        ctx.beginPath();
-        ctx.moveTo(x, height - 50);
-        ctx.lineTo(x, height);
-        ctx.stroke();
+      if (fmaSimulation.force > 0) {
+        ctx2.strokeStyle = '#10b981';
+        ctx2.lineWidth = 3;
+        ctx2.beginPath();
+        ctx2.moveTo(carX + carWidth, carY + carHeight/2);
+        ctx2.lineTo(carX + carWidth + 60, carY + carHeight/2);
+        ctx2.stroke();
+        
+        // Arrow head
+        ctx2.fillStyle = '#10b981';
+        ctx2.beginPath();
+        ctx2.moveTo(carX + carWidth + 60, carY + carHeight/2);
+        ctx2.lineTo(carX + carWidth + 50, carY + carHeight/2 - 6);
+        ctx2.lineTo(carX + carWidth + 50, carY + carHeight/2 + 6);
+        ctx2.closePath();
+        ctx2.fill();
+        
+        // Label
+        ctx2.fillStyle = '#1f2937';
+        ctx2.font = '14px Arial';
+        ctx2.fillText('Applied Force', carX + carWidth + 30, carY + carHeight/2 - 15);
       }
       
-      // Draw objects
-      const objWidth = 60;
-      const objHeight = 60;
-      const gap = 20;
-      
-      // Object A
-      const posX1 = width * 0.3;
-      const posY1 = height - 110;
-      
-      ctx.fillStyle = '#f59e0b';
-      ctx.fillRect(posX1, posY1, objWidth, objHeight);
-      ctx.strokeStyle = '#b45309';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(posX1, posY1, objWidth, objHeight);
-      
-      // Object B
-      const posX2 = posX1 + objWidth + gap;
-      const posY2 = height - 110;
-      
-      ctx.fillStyle = '#3b82f6';
-      ctx.fillRect(posX2, posY2, objWidth, objHeight);
-      ctx.strokeStyle = '#1d4ed8';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(posX2, posY2, objWidth, objHeight);
-      
-      // Draw force arrows
-      // Force on A
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(posX1 + objWidth, posY1 + objHeight/2);
-      ctx.lineTo(posX1 + objWidth + 40, posY1 + objHeight/2);
-      ctx.stroke();
-      
-      // Arrow head
-      ctx.beginPath();
-      ctx.moveTo(posX1 + objWidth + 40, posY1 + objHeight/2);
-      ctx.lineTo(posX1 + objWidth + 30, posY1 + objHeight/2 - 6);
-      ctx.lineTo(posX1 + objWidth + 30, posY1 + objHeight/2 + 6);
-      ctx.closePath();
-      ctx.fillStyle = '#ef4444';
-      ctx.fill();
-      
-      // Force on B
-      ctx.strokeStyle = '#10b981';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(posX2, posY2 + objHeight/2);
-      ctx.lineTo(posX2 - 40, posY2 + objHeight/2);
-      ctx.stroke();
-      
-      // Arrow head
-      ctx.beginPath();
-      ctx.moveTo(posX2 - 40, posY2 + objHeight/2);
-      ctx.lineTo(posX2 - 30, posY2 + objHeight/2 - 6);
-      ctx.lineTo(posX2 - 30, posY2 + objHeight/2 + 6);
-      ctx.closePath();
-      ctx.fillStyle = '#10b981';
-      ctx.fill();
-      
-      // Draw labels
-      ctx.fillStyle = '#1f2937';
-      ctx.font = '14px sans-serif';
-      ctx.fillText('F (A on B)', posX1 + objWidth + 10, posY1 + objHeight/2 - 20);
-      ctx.fillText('F (B on A)', posX2 - 70, posY2 + objHeight/2 - 20);
-      
-      // Draw object labels
-      ctx.fillStyle = '#1f2937';
-      ctx.font = 'bold 16px sans-serif';
-      ctx.fillText('A', posX1 + 25, posY1 + objHeight/2 + 5);
-      ctx.fillText('B', posX2 + 25, posY2 + objHeight/2 + 5);
+      // Draw friction arrow if moving
+      if (fmaSimulation.velocity !== 0) {
+        ctx2.strokeStyle = '#ef4444';
+        ctx2.lineWidth = 3;
+        ctx2.beginPath();
+        ctx2.moveTo(carX, carY + carHeight/2);
+        ctx2.lineTo(carX - 40, carY + carHeight/2);
+        ctx2.stroke();
+        
+        // Arrow head
+        ctx2.fillStyle = '#ef4444';
+        ctx2.beginPath();
+        ctx2.moveTo(carX - 40, carY + carHeight/2);
+        ctx2.lineTo(carX - 30, carY + carHeight/2 - 6);
+        ctx2.lineTo(carX - 30, carY + carHeight/2 + 6);
+        ctx2.closePath();
+        ctx2.fill();
+        
+        // Label
+        ctx2.fillStyle = '#1f2937';
+        ctx2.font = '14px Arial';
+        ctx2.fillText('Friction', carX - 70, carY + carHeight/2 - 15);
+      }
     }
 
-    // Initial draw
-    drawLaw1();
-    drawLaw2();
-    drawLaw3();
+    function updateFmaSimulation(timestamp) {
+      if (!fmaSimulation.running) return;
+      
+      if (!fmaSimulation.lastTime) fmaSimulation.lastTime = timestamp;
+      const deltaTime = (timestamp - fmaSimulation.lastTime) / 1000;
+      fmaSimulation.lastTime = timestamp;
+      
+      // Calculate forces
+      const normalForce = fmaSimulation.mass * GRAVITY;
+      fmaSimulation.frictionForce = fmaSimulation.friction * normalForce;
+      
+      // Calculate net force
+      if (fmaSimulation.velocity !== 0) {
+        // Kinetic friction - opposes motion
+        fmaSimulation.netForce = fmaSimulation.force - Math.sign(fmaSimulation.velocity) * fmaSimulation.frictionForce;
+      } else {
+        // Static friction - object doesn't move until force > max static friction
+        if (fmaSimulation.force > fmaSimulation.frictionForce) {
+          fmaSimulation.netForce = fmaSimulation.force - fmaSimulation.frictionForce;
+        } else if (fmaSimulation.force < -fmaSimulation.frictionForce) {
+          fmaSimulation.netForce = fmaSimulation.force + fmaSimulation.frictionForce;
+        } else {
+          fmaSimulation.netForce = 0;
+        }
+      }
+      
+      // Calculate acceleration
+      fmaSimulation.acceleration = fmaSimulation.netForce / fmaSimulation.mass;
+      
+      // Update velocity and position
+      fmaSimulation.velocity += fmaSimulation.acceleration * deltaTime;
+      fmaSimulation.position += fmaSimulation.velocity * deltaTime;
+      
+      // Boundary check - stop simulation at boundaries
+      const minX = 0.5;
+      const maxX = canvas2.width / PIXELS_PER_METER - 1.5;
+      
+      if (fmaSimulation.position < minX) {
+        fmaSimulation.position = minX;
+        fmaSimulation.velocity = 0;
+        fmaSimulation.running = false;
+        fmaSimulation.boundaryReached = true;
+        showBoundaryIndicator('2');
+      }
+      
+      if (fmaSimulation.position > maxX) {
+        fmaSimulation.position = maxX;
+        fmaSimulation.velocity = 0;
+        fmaSimulation.running = false;
+        fmaSimulation.boundaryReached = true;
+        showBoundaryIndicator('2');
+      }
+      
+      // Only update time if not at boundary
+      if (!fmaSimulation.boundaryReached) {
+        fmaSimulation.time += deltaTime;
+      }
+      
+      // Update metrics
+      document.getElementById('acceleration2').textContent = fmaSimulation.acceleration.toFixed(2) + ' m/s²';
+      document.getElementById('velocity2').textContent = fmaSimulation.velocity.toFixed(2) + ' m/s';
+      document.getElementById('netforce2').textContent = fmaSimulation.netForce.toFixed(2) + ' N';
+      document.getElementById('time2').textContent = fmaSimulation.time.toFixed(2) + ' s';
+      
+      // Render
+      renderFma();
+      
+      if (fmaSimulation.running) {
+        fmaSimulation.animationId = requestAnimationFrame(updateFmaSimulation);
+      }
+    }
 
-    // Slider value updates
-    // Law 1 sliders
-    const inertiaMass = document.getElementById('inertia-mass');
-    const inertiaMassVal = document.getElementById('inertia-mass-val');
-    inertiaMass.addEventListener('input', () => {
-      inertiaMassVal.textContent = `${inertiaMass.value} kg`;
+    // Set up Law 2 controls
+    document.getElementById('force-value').addEventListener('input', function() {
+      fmaSimulation.force = parseFloat(this.value);
+      document.getElementById('force-value-val').textContent = this.value + ' N';
+    });
+    
+    document.getElementById('mass-value').addEventListener('input', function() {
+      fmaSimulation.mass = parseFloat(this.value);
+      document.getElementById('mass-value-val').textContent = this.value + ' kg';
+    });
+    
+    document.getElementById('friction-value').addEventListener('input', function() {
+      fmaSimulation.friction = parseFloat(this.value);
+      document.getElementById('friction-value-val').textContent = parseFloat(this.value).toFixed(2);
+    });
+    
+    document.getElementById('start2').addEventListener('click', function() {
+      if (!fmaSimulation.running) {
+        fmaSimulation.running = true;
+        fmaSimulation.lastTime = 0;
+        fmaSimulation.boundaryReached = false;
+        requestAnimationFrame(updateFmaSimulation);
+        showNotification("F=ma simulation started! See how force affects acceleration.");
+      }
+    });
+    
+    document.getElementById('pause2').addEventListener('click', function() {
+      fmaSimulation.running = false;
+      if (fmaSimulation.animationId) {
+        cancelAnimationFrame(fmaSimulation.animationId);
+      }
+      showNotification("Simulation paused");
+    });
+    
+    document.getElementById('reset2').addEventListener('click', function() {
+      fmaSimulation.running = false;
+      fmaSimulation.boundaryReached = false;
+      if (fmaSimulation.animationId) {
+        cancelAnimationFrame(fmaSimulation.animationId);
+      }
+      fmaSimulation.position = 1;
+      fmaSimulation.velocity = 0;
+      fmaSimulation.acceleration = 0;
+      fmaSimulation.frictionForce = 0;
+      fmaSimulation.netForce = 0;
+      fmaSimulation.time = 0;
+      
+      document.getElementById('acceleration2').textContent = '0.00 m/s²';
+      document.getElementById('velocity2').textContent = '0.00 m/s';
+      document.getElementById('netforce2').textContent = '0.00 N';
+      document.getElementById('time2').textContent = '0.00 s';
+      
+      renderFma();
+      showNotification("Simulation reset");
     });
 
-    const inertiaFriction = document.getElementById('inertia-friction');
-    const inertiaFrictionVal = document.getElementById('inertia-friction-val');
-    inertiaFriction.addEventListener('input', () => {
-      inertiaFrictionVal.textContent = parseFloat(inertiaFriction.value).toFixed(2);
+    // Initial render
+    renderFma();
+
+    // =====================
+    // Law 3: Action-Reaction Simulation
+    // =====================
+    const canvas3 = document.getElementById('canvas3');
+    const ctx3 = canvas3.getContext('2d');
+    let actionReactionSimulation = {
+      massA: 5,
+      massB: 10,
+      force: 50,
+      positionA: 3,
+      positionB: 6,
+      velocityA: 0,
+      velocityB: 0,
+      accelerationA: 0,
+      accelerationB: 0,
+      forceA: 0,
+      forceB: 0,
+      time: 0,
+      running: false,
+      animationId: null,
+      lastTime: 0,
+      boundaryReached: false
+    };
+
+    function renderActionReaction() {
+      const width = canvas3.width;
+      const height = canvas3.height;
+      const surfaceHeight = 50;
+      
+      // Clear canvas
+      ctx3.clearRect(0, 0, width, height);
+      
+      // Draw background
+      ctx3.fillStyle = '#dbeafe';
+      ctx3.fillRect(0, 0, width, height);
+      
+      // Draw surface
+      ctx3.fillStyle = '#94a3b8';
+      ctx3.fillRect(0, height - surfaceHeight, width, surfaceHeight);
+      
+      // Draw grid lines and distance markers
+      ctx3.strokeStyle = '#64748b';
+      ctx3.lineWidth = 1;
+      ctx3.fillStyle = '#334155';
+      ctx3.font = '12px Arial';
+      ctx3.textAlign = 'center';
+      
+      for (let x = 0; x < width; x += PIXELS_PER_METER) {
+        ctx3.beginPath();
+        ctx3.moveTo(x, height - surfaceHeight);
+        ctx3.lineTo(x, height - surfaceHeight + 10);
+        ctx3.stroke();
+        
+        const meters = x / PIXELS_PER_METER;
+        ctx3.fillText(`${meters}m`, x, height - surfaceHeight + 25);
+      }
+      
+      // Draw object A
+      const boxSize = 60;
+      const boxA_X = actionReactionSimulation.positionA * PIXELS_PER_METER - boxSize/2;
+      const boxA_Y = height - surfaceHeight - boxSize;
+      
+      ctx3.fillStyle = '#f59e0b';
+      ctx3.fillRect(boxA_X, boxA_Y, boxSize, boxSize);
+      ctx3.fillStyle = '#1f2937';
+      ctx3.font = 'bold 16px Arial';
+      ctx3.textAlign = 'center';
+      ctx3.fillText('A', boxA_X + boxSize/2, boxA_Y + boxSize/2 + 5);
+      
+      // Draw object B
+      const boxB_X = actionReactionSimulation.positionB * PIXELS_PER_METER - boxSize/2;
+      const boxB_Y = height - surfaceHeight - boxSize;
+      
+      ctx3.fillStyle = '#3b82f6';
+      ctx3.fillRect(boxB_X, boxB_Y, boxSize, boxSize);
+      ctx3.fillStyle = '#1f2937';
+      ctx3.font = 'bold 16px Arial';
+      ctx3.fillText('B', boxB_X + boxSize/2, boxB_Y + boxSize/2 + 5);
+      
+      // Draw force arrows
+      if (actionReactionSimulation.force > 0) {
+        // Force on A (reaction)
+        ctx3.strokeStyle = '#ef4444';
+        ctx3.lineWidth = 3;
+        ctx3.beginPath();
+        ctx3.moveTo(boxA_X, boxA_Y + boxSize/2);
+        ctx3.lineTo(boxA_X - 50, boxA_Y + boxSize/2);
+        ctx3.stroke();
+        
+        ctx3.fillStyle = '#ef4444';
+        ctx3.beginPath();
+        ctx3.moveTo(boxA_X - 50, boxA_Y + boxSize/2);
+        ctx3.lineTo(boxA_X - 40, boxA_Y + boxSize/2 - 6);
+        ctx3.lineTo(boxA_X - 40, boxA_Y + boxSize/2 + 6);
+        ctx3.closePath();
+        ctx3.fill();
+        
+        ctx3.fillStyle = '#1f2937';
+        ctx3.font = '14px Arial';
+        ctx3.fillText('Reaction', boxA_X - 70, boxA_Y + boxSize/2 - 15);
+        
+        // Force on B (action)
+        ctx3.strokeStyle = '#10b981';
+        ctx3.lineWidth = 3;
+        ctx3.beginPath();
+        ctx3.moveTo(boxB_X + boxSize, boxB_Y + boxSize/2);
+        ctx3.lineTo(boxB_X + boxSize + 50, boxB_Y + boxSize/2);
+        ctx3.stroke();
+        
+        ctx3.fillStyle = '#10b981';
+        ctx3.beginPath();
+        ctx3.moveTo(boxB_X + boxSize + 50, boxB_Y + boxSize/2);
+        ctx3.lineTo(boxB_X + boxSize + 40, boxB_Y + boxSize/2 - 6);
+        ctx3.lineTo(boxB_X + boxSize + 40, boxB_Y + boxSize/2 + 6);
+        ctx3.closePath();
+        ctx3.fill();
+        
+        ctx3.fillStyle = '#1f2937';
+        ctx3.font = '14px Arial';
+        ctx3.fillText('Action', boxB_X + boxSize + 30, boxB_Y + boxSize/2 - 15);
+      }
+    }
+
+    function updateActionReactionSimulation(timestamp) {
+      if (!actionReactionSimulation.running) return;
+      
+      if (!actionReactionSimulation.lastTime) actionReactionSimulation.lastTime = timestamp;
+      const deltaTime = (timestamp - actionReactionSimulation.lastTime) / 1000;
+      actionReactionSimulation.lastTime = timestamp;
+      
+      // Calculate forces (action-reaction pair)
+      actionReactionSimulation.forceB = actionReactionSimulation.force;
+      actionReactionSimulation.forceA = -actionReactionSimulation.force; // Equal and opposite
+      
+      // Calculate accelerations
+      actionReactionSimulation.accelerationA = actionReactionSimulation.forceA / actionReactionSimulation.massA;
+      actionReactionSimulation.accelerationB = actionReactionSimulation.forceB / actionReactionSimulation.massB;
+      
+      // Update velocities
+      actionReactionSimulation.velocityA += actionReactionSimulation.accelerationA * deltaTime;
+      actionReactionSimulation.velocityB += actionReactionSimulation.accelerationB * deltaTime;
+      
+      // Update positions
+      actionReactionSimulation.positionA += actionReactionSimulation.velocityA * deltaTime;
+      actionReactionSimulation.positionB += actionReactionSimulation.velocityB * deltaTime;
+      
+      // Boundary checks
+      let hitBoundary = false;
+      const minX = 0.5;
+      const maxX = canvas3.width / PIXELS_PER_METER - 1.5;
+      
+      if (actionReactionSimulation.positionA < minX) {
+        actionReactionSimulation.positionA = minX;
+        actionReactionSimulation.velocityA = 0;
+        hitBoundary = true;
+      }
+      
+      if (actionReactionSimulation.positionB > maxX) {
+        actionReactionSimulation.positionB = maxX;
+        actionReactionSimulation.velocityB = 0;
+        hitBoundary = true;
+      }
+      
+      // Prevent objects from overlapping
+      const minDistance = 1.2; // meters
+      if (actionReactionSimulation.positionB - actionReactionSimulation.positionA < minDistance) {
+        actionReactionSimulation.positionA = actionReactionSimulation.positionB - minDistance;
+        actionReactionSimulation.velocityA = actionReactionSimulation.velocityB;
+        hitBoundary = true;
+      }
+      
+      if (hitBoundary) {
+        actionReactionSimulation.running = false;
+        actionReactionSimulation.boundaryReached = true;
+        showBoundaryIndicator('3');
+      }
+      
+      // Only update time if not at boundary
+      if (!actionReactionSimulation.boundaryReached) {
+        actionReactionSimulation.time += deltaTime;
+      }
+      
+      // Update metrics
+      document.getElementById('forceA').textContent = actionReactionSimulation.forceA.toFixed(2) + ' N';
+      document.getElementById('forceB').textContent = actionReactionSimulation.forceB.toFixed(2) + ' N';
+      document.getElementById('accelerationA').textContent = actionReactionSimulation.accelerationA.toFixed(2) + ' m/s²';
+      document.getElementById('accelerationB').textContent = actionReactionSimulation.accelerationB.toFixed(2) + ' m/s²';
+      
+      // Render
+      renderActionReaction();
+      
+      if (actionReactionSimulation.running) {
+        actionReactionSimulation.animationId = requestAnimationFrame(updateActionReactionSimulation);
+      }
+    }
+
+    // Set up Law 3 controls
+    document.getElementById('mass1-value').addEventListener('input', function() {
+      actionReactionSimulation.massA = parseFloat(this.value);
+      document.getElementById('mass1-value-val').textContent = this.value + ' kg';
+    });
+    
+    document.getElementById('mass2-value').addEventListener('input', function() {
+      actionReactionSimulation.massB = parseFloat(this.value);
+      document.getElementById('mass2-value-val').textContent = this.value + ' kg';
+    });
+    
+    document.getElementById('force-magnitude').addEventListener('input', function() {
+      actionReactionSimulation.force = parseFloat(this.value);
+      document.getElementById('force-magnitude-val').textContent = this.value + ' N';
+    });
+    
+    document.getElementById('start3').addEventListener('click', function() {
+      if (!actionReactionSimulation.running) {
+        actionReactionSimulation.running = true;
+        actionReactionSimulation.lastTime = 0;
+        actionReactionSimulation.boundaryReached = false;
+        requestAnimationFrame(updateActionReactionSimulation);
+        showNotification("Action-Reaction simulation started! Note the forces are equal but opposite.");
+      }
+    });
+    
+    document.getElementById('pause3').addEventListener('click', function() {
+      actionReactionSimulation.running = false;
+      if (actionReactionSimulation.animationId) {
+        cancelAnimationFrame(actionReactionSimulation.animationId);
+      }
+      showNotification("Simulation paused");
+    });
+    
+    document.getElementById('reset3').addEventListener('click', function() {
+      actionReactionSimulation.running = false;
+      actionReactionSimulation.boundaryReached = false;
+      if (actionReactionSimulation.animationId) {
+        cancelAnimationFrame(actionReactionSimulation.animationId);
+      }
+      actionReactionSimulation.positionA = 3;
+      actionReactionSimulation.positionB = 6;
+      actionReactionSimulation.velocityA = 0;
+      actionReactionSimulation.velocityB = 0;
+      actionReactionSimulation.accelerationA = 0;
+      actionReactionSimulation.accelerationB = 0;
+      actionReactionSimulation.forceA = 0;
+      actionReactionSimulation.forceB = 0;
+      actionReactionSimulation.time = 0;
+      
+      document.getElementById('forceA').textContent = '0.00 N';
+      document.getElementById('forceB').textContent = '0.00 N';
+      document.getElementById('accelerationA').textContent = '0.00 m/s²';
+      document.getElementById('accelerationB').textContent = '0.00 m/s²';
+      
+      renderActionReaction();
+      showNotification("Simulation reset");
     });
 
-    const inertiaInitial = document.getElementById('inertia-initial');
-    const inertiaInitialVal = document.getElementById('inertia-initial-val');
-    inertiaInitial.addEventListener('input', () => {
-      inertiaInitialVal.textContent = `${inertiaInitial.value} m/s`;
-    });
-
-    // Law 2 sliders
-    const forceValue = document.getElementById('force-value');
-    const forceValueVal = document.getElementById('force-value-val');
-    forceValue.addEventListener('input', () => {
-      forceValueVal.textContent = `${forceValue.value} N`;
-    });
-
-    const massValue = document.getElementById('mass-value');
-    const massValueVal = document.getElementById('mass-value-val');
-    massValue.addEventListener('input', () => {
-      massValueVal.textContent = `${massValue.value} kg`;
-    });
-
-    const frictionValue = document.getElementById('friction-value');
-    const frictionValueVal = document.getElementById('friction-value-val');
-    frictionValue.addEventListener('input', () => {
-      frictionValueVal.textContent = parseFloat(frictionValue.value).toFixed(2);
-    });
-
-    // Law 3 sliders
-    const mass1Value = document.getElementById('mass1-value');
-    const mass1ValueVal = document.getElementById('mass1-value-val');
-    mass1Value.addEventListener('input', () => {
-      mass1ValueVal.textContent = `${mass1Value.value} kg`;
-    });
-
-    const mass2Value = document.getElementById('mass2-value');
-    const mass2ValueVal = document.getElementById('mass2-value-val');
-    mass2Value.addEventListener('input', () => {
-      mass2ValueVal.textContent = `${mass2Value.value} kg`;
-    });
-
-    const forceMagnitude = document.getElementById('force-magnitude');
-    const forceMagnitudeVal = document.getElementById('force-magnitude-val');
-    forceMagnitude.addEventListener('input', () => {
-      forceMagnitudeVal.textContent = `${forceMagnitude.value} N`;
-    });
-
-    // Button functionality
-    document.querySelectorAll('.btn-start').forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Start simulation logic
-        btn.parentElement.parentElement.querySelector('.metric-value').textContent = "Running...";
-      });
-    });
-
-    document.querySelectorAll('.btn-pause').forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Pause simulation logic
-        btn.parentElement.parentElement.querySelector('.metric-value').textContent = "Paused";
-      });
-    });
-
-    document.querySelectorAll('.btn-reset').forEach(btn => {
-      btn.addEventListener('click', () => {
-        // Reset simulation logic
-        btn.parentElement.parentElement.querySelector('.metric-value').textContent = "0";
-      });
-    });
+    // Initial render
+    renderActionReaction();
   </script>
 </body>
 </html>
